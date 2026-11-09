@@ -1,8 +1,8 @@
 import { screen } from '@testing-library/react-native';
 
-import { buildTheme } from '@contexts/theme/settings';
+import { renderWithProviders } from '@utils/tests/render';
 
-import { renderWithProviders } from '@testUtils/render';
+import { buildTheme } from '@contexts/theme/settings';
 
 import Typography from '../typography';
 
