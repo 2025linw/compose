@@ -1,7 +1,8 @@
 import { StyleSheet } from 'react-native';
 import Animated from 'react-native-reanimated';
 
-import dayjs from '@lib/datetime';
+import type dayjs from '@lib/datetime';
+import { getDateToday } from '@utils/date';
 
 import { useTheme } from '@contexts/theme';
 import { type Theme } from '@contexts/theme/types';
@@ -55,7 +56,7 @@ function buildStyles(theme: Theme) {
 }
 
 function formatDate(inputDate: dayjs.Dayjs) {
-  const today = dayjs().startOf('day');
+  const today = getDateToday();
   const nextYear = today.startOf('year').add(1, 'year');
 
   const date = inputDate.startOf('day');

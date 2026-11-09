@@ -1,6 +1,7 @@
 import { StyleSheet } from 'react-native';
 
-import dayjs, { getDayOfWeek } from '@lib/datetime';
+import type dayjs from '@lib/datetime';
+import { getDateToday, getDayOfWeek } from '@utils/date';
 
 import { useTheme } from '@contexts/theme';
 import { type Theme } from '@contexts/theme/types';
@@ -16,7 +17,7 @@ export default function StartBadge(props: StartBadgeProps) {
   const theme = useTheme();
   const styles = buildStyles(theme);
 
-  const today = dayjs().startOf('day');
+  const today = getDateToday();
   const date = props.date.startOf('day');
 
   if (date.isSame(today)) {
@@ -43,7 +44,7 @@ function buildStyles(theme: Theme) {
 }
 
 function formatDate(inputDate: dayjs.Dayjs) {
-  const today = dayjs().startOf('day');
+  const today = getDateToday();
   const nextWeek = today.add(1, 'week');
   const nextYear = today.startOf('year').add(1, 'year');
 

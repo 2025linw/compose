@@ -1,5 +1,5 @@
 import type dayjs from '@lib/datetime';
-import { getDateToday } from '@lib/datetime';
+import { getDateToday } from '@utils/date';
 
 import { type Category, Cmp, type QueryParams, type TaskQuery } from './types';
 

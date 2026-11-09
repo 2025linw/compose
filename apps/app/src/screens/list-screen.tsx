@@ -3,9 +3,9 @@ import { StyleSheet } from 'react-native';
 
 import { type CreateRequest } from '@compose/types/task';
 
-import dayjs from '@lib/datetime';
 import { getCategoryQueryMap } from '@services/api/helpers';
 import { type Category } from '@services/api/types';
+import { getDateToday } from '@utils/date';
 
 import { useTheme } from '@contexts/theme';
 import { type Theme } from '@contexts/theme/types';
@@ -56,19 +56,19 @@ export default function ListScreen(props: ListScreenProps) {
       ...requiredTask,
       start: {
         type: 'datetime',
-        value: dayjs().startOf('day'),
+        value: getDateToday(),
       },
     }),
     upcoming: () => ({
       ...requiredTask,
       start: {
         type: 'datetime',
-        value: dayjs().add(1, 'day').startOf('day'),
+        value: getDateToday().startOf('day'),
       },
     }),
     deadline: () => ({
       ...requiredTask,
-      deadline: dayjs().startOf('day'),
+      deadline: getDateToday(),
     }),
   };
 

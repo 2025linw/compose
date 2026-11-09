@@ -1,4 +1,4 @@
-import { getDateToday } from '@lib/datetime';
+import { getDateToday } from '@utils/date';
 
 import Layout from '@components/layout';
 import Typography from '@components/primitive/typography';
