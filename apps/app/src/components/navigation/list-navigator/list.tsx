@@ -1,5 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 
+import { useSearchContext } from '@contexts/search';
+
 import HorizontalDivider from '@components/primitive/horizontal-divider';
 
 import { COLLAPSED_WIDTH } from './constants';
@@ -11,6 +13,7 @@ type ListProps = {
 
 export default function List({ expanded = true }: ListProps) {
   const styles = buildStyles(expanded);
+  const { openSearch } = useSearchContext();
 
   return (
     <View style={styles.list}>
@@ -69,6 +72,7 @@ export default function List({ expanded = true }: ListProps) {
         <NavButton
           icon={{ name: 'search', color: 'white' }}
           expanded={expanded}
+          onPress={openSearch}
         >
           Search
         </NavButton>

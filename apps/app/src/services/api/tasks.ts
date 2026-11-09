@@ -25,11 +25,11 @@ export async function getTasks(query: TaskQuery, signal?: AbortSignal) {
 }
 
 export async function searchTasks(search: string, signal?: AbortSignal) {
-  const res = await api.get<TaskResponse>(`/api/tasks?q=${search}`, {
+  const res = await api.get<TaskQueryResponse>(`/api/tasks?q=${search}`, {
     signal,
   });
 
-  return TaskResponseSchema.parse(res);
+  return TaskQueryResponseSchema.parse(res);
 }
 
 export async function createTask(payload: CreateRequest, signal?: AbortSignal) {
