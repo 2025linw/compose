@@ -28,7 +28,7 @@ export default function TimezoneSelect({
         })),
       ]}
       value={value}
-      onValueChange={(value) => onValueChange(value as string)}
+      onValueChange={(value) => onValueChange(value.toString())}
       label="Timezone"
       placeholder="Choose a timezone"
       type="screen"

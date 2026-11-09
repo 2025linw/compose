@@ -2,7 +2,6 @@ import { type PropsWithChildren, type ReactElement } from 'react';
 import { cloneElement } from 'react';
 import {
   type ColorValue,
-  Platform,
   type PressableProps,
   type StyleProp,
   type TextStyle,
@@ -90,8 +89,7 @@ export default function Button({
       style={(state) => [
         styles.container,
         (props.testOnly_hovered ||
-          (Platform.OS === 'web' &&
-            (state as typeof state & { hovered?: boolean }).hovered)) &&
+          (state.hovered !== undefined && state.hovered)) &&
           styles.hoveredStyle,
         state.pressed && styles.pressedStyle,
         typeof style === 'function' ? style(state) : style,
