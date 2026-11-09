@@ -2,7 +2,9 @@ use crate::{
     error::service::{
         INVALID_SINGLE_LINE, NO_EMPTY_STRING, NO_ZERO_LIMIT, NO_ZERO_PAGE, TOO_LONG,
         ValidationError,
-    }, types::route::UpdateField, utils::service::is_valid_single_line_string,
+    },
+    types::route::UpdateField,
+    utils::service::is_valid_single_line_string,
 };
 
 use super::{CreateRequest, URLQueryOpts, UpdateRequest};

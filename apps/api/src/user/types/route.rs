@@ -16,7 +16,9 @@ pub struct ProvisionRequest {
 #[derive(Debug, Default, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateRequest {
+    #[serde(default)]
     pub preferred_timezone: UpdateField<Tz>,
+    #[serde(default)]
     pub completed_task_retention: UpdateField<CompletedTaskRetention>,
 }
 

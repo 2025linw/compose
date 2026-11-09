@@ -25,6 +25,7 @@ pub struct CreateRequest {
 #[serde(rename_all = "camelCase")]
 pub struct UpdateRequest {
     pub label: Option<String>,
+    #[serde(default)]
     pub category: UpdateField<String>,
 
     pub position_key: Option<String>,
