@@ -30,8 +30,8 @@ const styles = StyleSheet.create({
   backdrop: {
     padding: '5%',
 
-    justifyContent: 'center',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   footer: {
     position: 'absolute',

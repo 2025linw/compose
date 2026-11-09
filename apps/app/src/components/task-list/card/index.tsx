@@ -212,8 +212,8 @@ function buildStyles(theme: Theme, expanded: boolean) {
     mainRow: {
       flexShrink: 0,
       flexDirection: 'row',
-      justifyContent: 'flex-start',
       alignItems: 'center',
+      justifyContent: 'flex-start',
       gap: theme.spacings.x2,
     },
     panelContent: {
@@ -244,15 +244,15 @@ function buildStyles(theme: Theme, expanded: boolean) {
 
       display: 'flex',
       flexDirection: 'column',
-      justifyContent: 'flex-start',
       alignItems: 'stretch',
+      justifyContent: 'flex-start',
       gap: theme.spacings.x4,
     },
     buttonSet: {
       display: 'flex',
       flexDirection: 'row',
-      justifyContent: 'flex-end',
       alignItems: 'center',
+      justifyContent: 'flex-end',
       gap: theme.spacings.x4,
     },
   });

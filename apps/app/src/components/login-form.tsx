@@ -160,8 +160,8 @@ function buildStyles(theme: Theme) {
       backgroundColor: theme.palette.surface,
     },
     inputContainer: {
-      justifyContent: 'center',
       alignItems: 'center',
+      justifyContent: 'center',
     },
     loginField: {
       margin: theme.spacings.x2,

@@ -48,6 +48,7 @@ function buildStyles(theme: Theme) {
     container: {
       flexDirection: 'row',
       alignItems: 'center',
+      justifyContent: 'space-between',
     },
     text: {
       ...theme.components.Typography.variants.text,

@@ -108,8 +108,8 @@ function buildStyles(theme: Theme) {
     overlay: {
       flex: 1,
 
-      justifyContent: 'center',
       alignItems: 'center',
+      justifyContent: 'center',
     },
     container: {
       padding: theme.spacings.x4,
