@@ -1,4 +1,4 @@
-import { useRoute, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { StyleSheet } from 'react-native';
 
 import { useTheme } from '@contexts/theme';
@@ -9,12 +9,10 @@ import Button from '@components/primitive/button';
 import Typography from '@components/primitive/typography';
 
 export default function NotFoundScreen() {
-  const route = useRoute();
   const router = useRouter();
   const theme = useTheme();
 
   const styles = buildStyles(theme);
-  console.log(route);
 
   return (
     <Layout
