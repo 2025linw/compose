@@ -11,9 +11,9 @@ import {
 
 import { api } from './client';
 import { buildTaskQuery } from './helpers';
-import { type TaskQuery } from './types';
+import { type TaskFilterQuery } from './types';
 
-export async function getTasks(query: TaskQuery, signal?: AbortSignal) {
+export async function getTasks(query: TaskFilterQuery, signal?: AbortSignal) {
   const params = buildTaskQuery(query);
 
   const res = await api.get<TaskQueryResponse>('/api/tasks', {

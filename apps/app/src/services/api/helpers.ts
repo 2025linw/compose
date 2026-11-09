@@ -1,8 +1,8 @@
 import { getDateToday, toDate, toDatetime } from '@utils/date';
 
-import { type Category, type QueryParams, type TaskQuery } from './types';
+import { type Category, type QueryParams, type TaskFilterQuery } from './types';
 
-export function getCategoryQuery(category: Category): TaskQuery {
+export function getTaskFilter(category: Category): TaskFilterQuery {
   const today = getDateToday();
   const tomorrow = today.add(1, 'day');
 
@@ -26,7 +26,7 @@ export function getCategoryQuery(category: Category): TaskQuery {
   }
 }
 
-export function buildTaskQuery(query: TaskQuery): QueryParams {
+export function buildTaskQuery(query: TaskFilterQuery): QueryParams {
   const params: QueryParams = {};
   if (query.startDate !== undefined) {
     const type = query.startDate.type;

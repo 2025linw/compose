@@ -1,12 +1,20 @@
+import { getTaskFilter } from '@services/api/helpers';
+
 import Icon from '@components/primitive/icon';
 
-import ListScreen from '@screens/list-screen';
+import TaskListScreen from '@screens/task-list-screen';
 
 export default function InboxPage() {
+  const filter = getTaskFilter('inbox');
+  const creation = {
+    enabled: true,
+  };
+
   return (
-    <ListScreen
+    <TaskListScreen
+      filter={filter}
+      creation={creation}
       listName="Inbox"
-      category={'inbox'}
       listIcon={
         <Icon
           name="file-tray"

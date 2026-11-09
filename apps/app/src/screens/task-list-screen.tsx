@@ -3,9 +3,7 @@ import { StyleSheet } from 'react-native';
 
 import { type CreateRequest } from '@compose/types/task';
 
-import { getCategoryQuery } from '@services/api/helpers';
-import { type Category } from '@services/api/types';
-import { getDateToday } from '@utils/date';
+import { type TaskFilterQuery } from '@services/api/types';
 
 import { useTheme } from '@contexts/theme';
 import { type Theme } from '@contexts/theme/types';
@@ -16,21 +14,39 @@ import Layout from '@components/layout';
 import { type IconProps } from '@components/primitive/icon';
 import TaskList from '@components/task-list';
 
-type ListScreenProps = {
-  listName: string;
-  listIcon?: ReactElement<IconProps>;
-  category: Category;
+const taskDefaults = {
+  title: '',
+  positionKey: 'm',
+  tags: [],
 };
 
-export default function ListScreen(props: ListScreenProps) {
+type TaskCreation =
+  | {
+      enabled: false;
+    }
+  | {
+      enabled: true;
+      defaults?: Partial<CreateRequest>;
+    };
+
+type TaskListScreenProps = {
+  filter: TaskFilterQuery;
+  creation: TaskCreation;
+  listName: string;
+  listIcon?: ReactElement<IconProps>;
+};
+
+export default function TaskListScreen({
+  filter,
+  creation,
+  ...props
+}: TaskListScreenProps) {
   const theme = useTheme();
   const { gtTablet } = useBreakpoints();
 
   const styles = buildStyles(theme, !gtTablet);
 
-  const searchQuery = getCategoryQuery(props.category);
-
-  const queryTasks = TaskHook.useTasks(searchQuery);
+  const queryTasks = TaskHook.useTasks(filter);
 
   const createTask = TaskHook.useCreateTask();
   const updateTask = TaskHook.useUpdateTask();
@@ -38,6 +54,19 @@ export default function ListScreen(props: ListScreenProps) {
   const reopenTask = TaskHook.useReopenTask();
   const trashTask = TaskHook.useTrashTask();
   const restoreTask = TaskHook.useRestoreTask();
+
+  const onAddTask = creation.enabled
+    ? (onCreateCallback: (id: string) => void) => {
+        createTask.mutate(
+          { ...taskDefaults, ...creation.defaults },
+          {
+            onSuccess: ({ data }) => {
+              onCreateCallback(data.id);
+            },
+          },
+        );
+      }
+    : undefined;
 
   return (
     <Layout
@@ -49,15 +78,7 @@ export default function ListScreen(props: ListScreenProps) {
       <TaskList
         data={queryTasks.data?.data.tasks}
 
-        onAddTask={(onCreateCallback) => {
-          const category = props.category;
-          if (category !== 'logged' && category !== 'trash')
-            createTask.mutate(createTaskPayload(category), {
-              onSuccess: ({ data }) => {
-                onCreateCallback(data.id);
-              },
-            });
-        }}
+        onAddTask={onAddTask}
         onTaskUpdate={(id, update) =>
           updateTask.mutate({ id, payload: update })
         }
@@ -76,46 +97,4 @@ function buildStyles(theme: Theme, isMobile: boolean) {
       paddingHorizontal: isMobile ? theme.spacings.x2 : theme.spacings.x10,
     },
   });
-}
-
-const requiredTask: CreateRequest = {
-  title: '',
-  tags: [],
-  positionKey: 'm',
-};
-
-type CreatableCategory = Extract<
-  Category,
-  'inbox' | 'today' | 'upcoming' | 'deadline'
->;
-
-function createTaskPayload(category: CreatableCategory): CreateRequest {
-  switch (category) {
-    case 'inbox':
-      return requiredTask;
-    case 'today':
-      return {
-        ...requiredTask,
-        start: {
-          type: 'datetime',
-          value: getDateToday(),
-        },
-      };
-    case 'upcoming':
-      return {
-        ...requiredTask,
-        start: {
-          type: 'datetime',
-          value: getDateToday().add(1, 'day'),
-        },
-      };
-    case 'deadline':
-      return {
-        ...requiredTask,
-        deadline: getDateToday(),
-      };
-    default:
-      const exhaustive: never = category;
-      return exhaustive;
-  }
 }

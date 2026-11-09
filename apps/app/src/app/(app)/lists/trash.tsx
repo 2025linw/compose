@@ -1,12 +1,17 @@
+import { getTaskFilter } from '@services/api/helpers';
+
 import Icon from '@components/primitive/icon';
 
-import ListScreen from '@screens/list-screen';
+import TaskListScreen from '@screens/task-list-screen';
 
 export default function TrashPage() {
+  const filter = getTaskFilter('trash');
+
   return (
-    <ListScreen
+    <TaskListScreen
+      filter={filter}
+      creation={{ enabled: false }}
       listName="Trash"
-      category={'trash'}
       listIcon={
         <Icon
           name="trash-bin"

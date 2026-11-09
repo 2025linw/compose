@@ -15,12 +15,12 @@ import {
   trashTask,
   updateTask,
 } from '@services/api/tasks';
-import { type TaskQuery } from '@services/api/types';
+import { type TaskFilterQuery } from '@services/api/types';
 
-export function useTasks(query: TaskQuery) {
+export function useTasks(filter: TaskFilterQuery) {
   return useQuery({
-    queryKey: ['tasks', query],
-    queryFn: () => getTasks(query),
+    queryKey: ['tasks', filter],
+    queryFn: () => getTasks(filter),
   });
 }
 

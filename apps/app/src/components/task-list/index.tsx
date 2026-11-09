@@ -59,18 +59,21 @@ export default function TaskList({
       }
     });
 
-  const handleTaskPress = (id: string) => {
+  const taskPressHandler = (id: string) => {
     if (activeExpandedTask === null) {
       setExpandedTask(data?.find((task) => task.id === id) || null);
     } else if (activeExpandedTask.id !== id) {
       setExpandedTask(null);
     }
   };
-  const addTask = () => {
-    onAddTask?.((id) => {
-      taskAdded.current = id;
-    });
-  };
+  const addTaskHandler = onAddTask
+    ? () => {
+        onAddTask?.((id) => {
+          taskAdded.current = id;
+        });
+      }
+    : undefined;
+
   const renderTask = ({ item }: ListRenderItemInfo<Task>) => {
     const expanded = item.id === activeExpandedTask?.id;
 
@@ -86,7 +89,7 @@ export default function TaskList({
           task={item}
           expanded={expanded}
 
-          onPress={() => handleTaskPress(item.id)}
+          onPress={() => taskPressHandler(item.id)}
 
           onTaskUpdate={(patch) => onTaskUpdate?.(item.id, patch)}
           onTaskComplete={() => onTaskComplete?.(item.id)}
@@ -144,7 +147,7 @@ export default function TaskList({
         state={activeExpandedTask ? 'card' : 'list'}
         style={styles.menuButton}
         deleted={!!activeExpandedTask?.deletedAt}
-        onAddTask={addTask}
+        onAddTask={addTaskHandler}
         onTrashTask={() => {
           if (activeExpandedTask) onTaskTrash?.(activeExpandedTask.id);
         }}

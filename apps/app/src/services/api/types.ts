@@ -18,7 +18,7 @@ export type DateQuery =
       date: dayjs.Dayjs;
     };
 
-export type TaskQuery = {
+export type TaskFilterQuery = {
   startDate?: DateQuery;
   deadline?: DateQuery;
 

@@ -1,12 +1,26 @@
+import { type CreateRequest } from '@compose/types/task';
+
+import { getTaskFilter } from '@services/api/helpers';
+import { getDateToday } from '@utils/date';
+
 import Icon from '@components/primitive/icon';
 
-import ListScreen from '@screens/list-screen';
+import TaskListScreen from '@screens/task-list-screen';
 
 export default function TodayPage() {
+  const filter = getTaskFilter('today');
+  const defaults: Partial<CreateRequest> = {
+    start: {
+      type: 'datetime',
+      value: getDateToday(),
+    },
+  };
+
   return (
-    <ListScreen
+    <TaskListScreen
+      filter={filter}
+      creation={{ enabled: true, defaults }}
       listName="Today"
-      category={'today'}
       listIcon={
         <Icon
           name="today"

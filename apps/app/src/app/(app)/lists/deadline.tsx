@@ -1,12 +1,23 @@
+import { type CreateRequest } from '@compose/types/task';
+
+import { getTaskFilter } from '@services/api/helpers';
+import { getDateToday } from '@utils/date';
+
 import Icon from '@components/primitive/icon';
 
-import ListScreen from '@screens/list-screen';
+import TaskListScreen from '@screens/task-list-screen';
 
 export default function DeadlinePage() {
+  const filter = getTaskFilter('deadline');
+  const defaults: Partial<CreateRequest> = {
+    deadline: getDateToday(),
+  };
+
   return (
-    <ListScreen
+    <TaskListScreen
+      filter={filter}
+      creation={{ enabled: true, defaults }}
       listName="Deadline"
-      category={'deadline'}
       listIcon={
         <Icon
           name="flag"
