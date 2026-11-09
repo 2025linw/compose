@@ -1,6 +1,6 @@
 import { getDateToday, toDate, toDatetime } from '@utils/date';
 
-import { type Category, Cmp, type QueryParams, type TaskQuery } from './types';
+import { type Category, type QueryParams, type TaskQuery } from './types';
 
 export function getCategoryQuery(category: Category): TaskQuery {
   const today = getDateToday();
@@ -10,9 +10,9 @@ export function getCategoryQuery(category: Category): TaskQuery {
     case 'inbox':
       return { startDate: { type: 'ex', state: false } };
     case 'today':
-      return { startDate: { type: 'cmp', date: tomorrow, cmp: Cmp.Less } };
+      return { startDate: { type: 'cmp', date: tomorrow, cmp: 'lt' } };
     case 'upcoming':
-      return { startDate: { type: 'cmp', date: tomorrow, cmp: Cmp.GreaterEq } };
+      return { startDate: { type: 'cmp', date: tomorrow, cmp: 'gte' } };
     case 'deadline':
       return { deadline: { type: 'ex', state: true } };
     case 'logged':

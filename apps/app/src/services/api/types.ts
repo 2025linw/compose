@@ -7,14 +7,7 @@ export type QueryParams = Record<
 
 export type SortOrder = 'asc' | 'desc';
 
-export enum Cmp {
-  Equal = 'eq',
-  NotEqual = 'ne',
-  Less = 'lt',
-  LessEq = 'lte',
-  Greater = 'gt',
-  GreaterEq = 'gte',
-}
+export type Cmp = 'eq' | 'ne' | 'lt' | 'lte' | 'gt' | 'gte';
 
 export type DateQuery =
   | { type: 'ex'; state: boolean }
