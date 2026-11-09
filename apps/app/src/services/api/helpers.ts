@@ -1,49 +1,29 @@
-import type dayjs from '@lib/datetime';
-import { getDateToday } from '@utils/date';
+import { getDateToday, toDate, toDatetime } from '@utils/date';
 
 import { type Category, Cmp, type QueryParams, type TaskQuery } from './types';
 
-export function toYYYYMMDD(input_date: dayjs.Dayjs) {
-  return input_date.format('YYYY-MM-DD');
-}
-
-export function getCategoryQueryMap(): Record<Category, TaskQuery> {
+export function getCategoryQuery(category: Category): TaskQuery {
   const today = getDateToday();
   const tomorrow = today.add(1, 'day');
 
-  return {
-    inbox: {
-      startDate: { type: 'ex', state: false },
-    },
-    today: {
-      startDate: {
-        type: 'cmp',
-        date: tomorrow,
-        cmp: Cmp.Less,
-      },
-      sortBy: 'start',
-    },
-    upcoming: {
-      startDate: {
-        type: 'cmp',
-        date: tomorrow,
-        cmp: Cmp.GreaterEq,
-      },
-      sortBy: 'start',
-    },
-    deadline: {
-      deadline: { type: 'ex', state: true },
-      sortBy: 'deadline',
-    },
-    logged: {
-      completed: true,
-      sortBy: 'completed',
-      sortOrder: 'desc',
-    },
-    trash: {
-      deleted: true,
-    },
-  };
+  switch (category) {
+    case 'inbox':
+      return { startDate: { type: 'ex', state: false } };
+    case 'today':
+      return { startDate: { type: 'cmp', date: tomorrow, cmp: Cmp.Less } };
+    case 'upcoming':
+      return { startDate: { type: 'cmp', date: tomorrow, cmp: Cmp.GreaterEq } };
+    case 'deadline':
+      return { deadline: { type: 'ex', state: true } };
+    case 'logged':
+      return { completed: true, sortBy: 'completedAt', sortOrder: 'desc' };
+    case 'trash':
+      return { deleted: true, sortBy: 'deletedAt', sortOrder: 'desc' };
+    default: {
+      const exhaustive: never = category;
+      return exhaustive;
+    }
+  }
 }
 
 export function buildTaskQuery(query: TaskQuery): QueryParams {
@@ -53,10 +33,11 @@ export function buildTaskQuery(query: TaskQuery): QueryParams {
     if (type === 'ex') {
       params['start'] = String(query.startDate.state);
     } else if (type === 'eq') {
-      params['start'] = query.startDate.date.toISOString();
+      params['start'] = toDatetime(query.startDate.date);
     } else {
-      params[`start[${query.startDate.cmp}]`] =
-        query.startDate.date.toISOString();
+      params[`start[${query.startDate.cmp}]`] = toDatetime(
+        query.startDate.date,
+      );
     }
   }
   if (query.deadline !== undefined) {
@@ -64,11 +45,9 @@ export function buildTaskQuery(query: TaskQuery): QueryParams {
     if (type === 'ex') {
       params['deadline'] = String(query.deadline.state);
     } else if (type === 'eq') {
-      params['deadline'] = toYYYYMMDD(query.deadline.date);
+      params['deadline'] = toDate(query.deadline.date);
     } else {
-      params[`deadline[${query.deadline.cmp}]`] = toYYYYMMDD(
-        query.deadline.date,
-      );
+      params[`deadline[${query.deadline.cmp}]`] = toDate(query.deadline.date);
     }
   }
 

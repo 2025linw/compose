@@ -5,6 +5,8 @@ export type QueryParams = Record<
   string | number | boolean | null | undefined
 >;
 
+export type SortOrder = 'asc' | 'desc';
+
 export enum Cmp {
   Equal = 'eq',
   NotEqual = 'ne',
@@ -31,7 +33,7 @@ export type TaskQuery = {
   deleted?: boolean;
 
   sortBy?: string;
-  sortOrder?: string;
+  sortOrder?: SortOrder;
 };
 
 export type Category =

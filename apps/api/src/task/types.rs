@@ -37,7 +37,7 @@ impl std::fmt::Display for TaskID {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
-#[serde(rename_all = "lowercase")]
+#[serde(rename_all = "camelCase")]
 pub enum SortBy {
     ID,
     Created,
@@ -45,8 +45,8 @@ pub enum SortBy {
     Start,
     Deadline,
     Position,
-    Completed,
-    Deleted,
+    CompletedAt,
+    DeletedAt,
 }
 
 impl std::fmt::Display for SortBy {
@@ -58,8 +58,8 @@ impl std::fmt::Display for SortBy {
             SortBy::Start => write!(f, "start"),
             SortBy::Deadline => write!(f, "deadline"),
             SortBy::Position => write!(f, "position_key"),
-            SortBy::Completed => write!(f, "completed_at"),
-            SortBy::Deleted => write!(f, "deleted_at"),
+            SortBy::CompletedAt => write!(f, "completed_at"),
+            SortBy::DeletedAt => write!(f, "deleted_at"),
         }
     }
 }

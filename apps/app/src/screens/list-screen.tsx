@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 
 import { type CreateRequest } from '@compose/types/task';
 
-import { getCategoryQueryMap } from '@services/api/helpers';
+import { getCategoryQuery } from '@services/api/helpers';
 import { type Category } from '@services/api/types';
 import { getDateToday } from '@utils/date';
 
@@ -39,7 +39,7 @@ export default function ListScreen(props: ListScreenProps) {
 
   const styles = buildStyles(theme, !gtTablet);
 
-  const searchQuery = getCategoryQueryMap()[props.category];
+  const searchQuery = getCategoryQuery(props.category);
 
   const queryTasks = TaskHook.useTasks(searchQuery);
 
