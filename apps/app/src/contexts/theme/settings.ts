@@ -9,11 +9,11 @@ import {
   typographyVariants,
   zHeight,
 } from './tokens';
-import { type ColorVariantName, type Palette, type ThemeMode } from './types';
+import { type ColorVariantName, type ThemeMode } from './types';
 
 export function buildTheme(variant: ColorVariantName, theme: ThemeMode) {
   const themeColors = colorThemes[variant][theme];
-  const palette: Palette = buildPalette(themeColors);
+  const palette = buildPalette(themeColors);
 
   return {
     darkMode: theme === 'dark',
