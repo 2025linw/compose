@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { type ListRenderItemInfo, StyleSheet, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { useSharedValue } from 'react-native-reanimated';
@@ -11,7 +11,7 @@ import type dayjs from '@lib/datetime';
 import { useTheme } from '@contexts/theme';
 import { type Theme } from '@contexts/theme/types';
 
-import DateSelectModal from '@components/modals/date-select-modal';
+import DateTimeModal from '@components/modals/date-time';
 
 import Card from './card';
 import MenuButton from './menu-button';
@@ -50,22 +50,6 @@ export default function TaskList({
   const activeExpandedTask = data?.some(({ id }) => id === expandedTask?.id)
     ? expandedTask
     : null;
-
-  const handleTaskPress = useCallback(
-    (id: string) => {
-      if (activeExpandedTask === null) {
-        setExpandedTask(data?.find((task) => task.id === id) || null);
-      } else if (activeExpandedTask.id !== id) {
-        setExpandedTask(null);
-      }
-    },
-    [data, activeExpandedTask],
-  );
-  const addTask = useCallback(() => {
-    onAddTask?.((id) => {
-      taskAdded.current = id;
-    });
-  }, [taskAdded, onAddTask]);
   const tapGesture = Gesture.Tap()
     .maxDistance(5)
     .cancelsTouchesInView(false)
@@ -75,6 +59,58 @@ export default function TaskList({
       }
     });
 
+  const handleTaskPress = (id: string) => {
+    if (activeExpandedTask === null) {
+      setExpandedTask(data?.find((task) => task.id === id) || null);
+    } else if (activeExpandedTask.id !== id) {
+      setExpandedTask(null);
+    }
+  };
+  const addTask = () => {
+    onAddTask?.((id) => {
+      taskAdded.current = id;
+    });
+  };
+  const renderTask = ({ item }: ListRenderItemInfo<Task>) => {
+    const expanded = item.id === activeExpandedTask?.id;
+
+    return (
+      <View
+        onStartShouldSetResponderCapture={() => {
+          touchedCard.set(true);
+
+          return false;
+        }}
+      >
+        <Card
+          task={item}
+          expanded={expanded}
+
+          onPress={() => handleTaskPress(item.id)}
+
+          onTaskUpdate={(patch) => onTaskUpdate?.(item.id, patch)}
+          onTaskComplete={() => onTaskComplete?.(item.id)}
+          onTaskReopen={() => onTaskReopen?.(item.id)}
+
+          onPressStartDate={(date) => {
+            setDateModal({
+              taskId: item.id,
+              state: 'start',
+              initialDate: date,
+            });
+          }}
+          onPressDeadline={(date) => {
+            setDateModal({
+              taskId: item.id,
+              state: 'deadline',
+              initialDate: date,
+            });
+          }}
+        />
+      </View>
+    );
+  };
+
   useEffect(() => {
     const newTask = data?.find((task) => taskAdded.current === task.id);
     if (newTask) {
@@ -83,56 +119,6 @@ export default function TaskList({
 
     taskAdded.current = null;
   }, [taskAdded, data]);
-
-  const renderTask = useCallback(
-    ({ item }: ListRenderItemInfo<Task>) => {
-      const expanded = item.id === activeExpandedTask?.id;
-
-      return (
-        <View
-          onStartShouldSetResponderCapture={() => {
-            touchedCard.set(true);
-
-            return false;
-          }}
-        >
-          <Card
-            task={item}
-            expanded={expanded}
-
-            onPress={() => handleTaskPress(item.id)}
-
-            onTaskUpdate={(patch) => onTaskUpdate?.(item.id, patch)}
-            onTaskComplete={() => onTaskComplete?.(item.id)}
-            onTaskReopen={() => onTaskReopen?.(item.id)}
-
-            onPressStartDate={(date) => {
-              setDateModal({
-                taskId: item.id,
-                state: 'start',
-                initialDate: date,
-              });
-            }}
-            onPressDeadline={(date) => {
-              setDateModal({
-                taskId: item.id,
-                state: 'deadline',
-                initialDate: date,
-              });
-            }}
-          />
-        </View>
-      );
-    },
-    [
-      touchedCard,
-      activeExpandedTask,
-      handleTaskPress,
-      onTaskComplete,
-      onTaskReopen,
-      onTaskUpdate,
-    ],
-  );
 
   return (
     <>
@@ -168,7 +154,7 @@ export default function TaskList({
       />
 
       {dateModal && (
-        <DateSelectModal
+        <DateTimeModal
           mode={dateModal.state}
           taskId={dateModal.taskId}
           initialDate={dateModal.initialDate}

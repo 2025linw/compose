@@ -7,7 +7,7 @@ import Toasts from '@lib/toast';
 import { useSession } from '@contexts/auth';
 import { useBreakpoints } from '@hooks/use-breakpoint';
 
-import SearchModal from '@components/modals/search-modal';
+import TaskSearchModal from '@components/modals/task-search';
 import ListNavigator from '@components/navigation/list-navigator';
 
 export default function AppShell() {
@@ -41,7 +41,7 @@ export default function AppShell() {
             />
           )}
 
-          <SearchModal />
+          <TaskSearchModal />
         </>
       ) : (
         <Stack
