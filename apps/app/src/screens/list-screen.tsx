@@ -16,17 +16,6 @@ import Layout from '@components/layout';
 import { type IconProps } from '@components/primitive/icon';
 import TaskList from '@components/task-list';
 
-const requiredTask: CreateRequest = {
-  title: '',
-  tags: [],
-  positionKey: 'm',
-};
-
-type CreatableCategory = Extract<
-  Category,
-  'inbox' | 'today' | 'upcoming' | 'deadline'
->;
-
 type ListScreenProps = {
   listName: string;
   listIcon?: ReactElement<IconProps>;
@@ -50,28 +39,6 @@ export default function ListScreen(props: ListScreenProps) {
   const trashTask = TaskHook.useTrashTask();
   const restoreTask = TaskHook.useRestoreTask();
 
-  const defaultTask: Record<CreatableCategory, () => CreateRequest> = {
-    inbox: () => requiredTask,
-    today: () => ({
-      ...requiredTask,
-      start: {
-        type: 'datetime',
-        value: getDateToday(),
-      },
-    }),
-    upcoming: () => ({
-      ...requiredTask,
-      start: {
-        type: 'datetime',
-        value: getDateToday().startOf('day'),
-      },
-    }),
-    deadline: () => ({
-      ...requiredTask,
-      deadline: getDateToday(),
-    }),
-  };
-
   return (
     <Layout
       headerText={props.listName}
@@ -85,7 +52,7 @@ export default function ListScreen(props: ListScreenProps) {
         onAddTask={(onCreateCallback) => {
           const category = props.category;
           if (category !== 'logged' && category !== 'trash')
-            createTask.mutate(defaultTask[category](), {
+            createTask.mutate(createTaskPayload(category), {
               onSuccess: ({ data }) => {
                 onCreateCallback(data.id);
               },
@@ -109,4 +76,46 @@ function buildStyles(theme: Theme, isMobile: boolean) {
       paddingHorizontal: isMobile ? theme.spacings.x2 : theme.spacings.x10,
     },
   });
+}
+
+const requiredTask: CreateRequest = {
+  title: '',
+  tags: [],
+  positionKey: 'm',
+};
+
+type CreatableCategory = Extract<
+  Category,
+  'inbox' | 'today' | 'upcoming' | 'deadline'
+>;
+
+function createTaskPayload(category: CreatableCategory): CreateRequest {
+  switch (category) {
+    case 'inbox':
+      return requiredTask;
+    case 'today':
+      return {
+        ...requiredTask,
+        start: {
+          type: 'datetime',
+          value: getDateToday(),
+        },
+      };
+    case 'upcoming':
+      return {
+        ...requiredTask,
+        start: {
+          type: 'datetime',
+          value: getDateToday().add(1, 'day'),
+        },
+      };
+    case 'deadline':
+      return {
+        ...requiredTask,
+        deadline: getDateToday(),
+      };
+    default:
+      const exhaustive: never = category;
+      return exhaustive;
+  }
 }
