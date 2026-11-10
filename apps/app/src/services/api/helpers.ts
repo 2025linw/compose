@@ -12,9 +12,17 @@ export function getTaskFilter(category: Category): TaskFilterQuery {
     case 'today':
       return { startDate: { type: 'cmp', date: tomorrow, cmp: 'lt' } };
     case 'upcoming':
-      return { startDate: { type: 'cmp', date: tomorrow, cmp: 'gte' } };
+      return {
+        startDate: { type: 'cmp', date: tomorrow, cmp: 'gte' },
+        sortBy: 'start',
+        sortOrder: 'asc',
+      };
     case 'deadline':
-      return { deadline: { type: 'ex', state: true } };
+      return {
+        deadline: { type: 'ex', state: true },
+        sortBy: 'deadline',
+        sortOrder: 'asc',
+      };
     case 'logged':
       return { completed: true, sortBy: 'completedAt', sortOrder: 'desc' };
     case 'trash':
