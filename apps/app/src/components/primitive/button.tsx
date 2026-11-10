@@ -96,7 +96,7 @@ export default function Button({
       ]}
       role="button"
     >
-      {leftIcon}
+      {leftIcon && <View style={styles.iconContainer}>{leftIcon}</View>}
 
       {children && (
         <View style={styles.textContainer}>
@@ -116,7 +116,11 @@ export default function Button({
         </View>
       )}
 
-      {rightIcon}
+      {rightIcon && (
+        <View style={[styles.iconContainer, styles.rightIconContainer]}>
+          {rightIcon}
+        </View>
+      )}
     </Pressable>
   );
 }
@@ -158,7 +162,7 @@ function buildStyles(
 
       flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'space-between',
+      justifyContent: 'flex-start',
       gap: theme.spacings.x2,
 
       borderWidth: useBorder ? BORDER_WIDTH : 0,
@@ -174,11 +178,19 @@ function buildStyles(
       }),
     },
     textContainer: {
-      flex: 1,
+      flexShrink: 1,
+      minWidth: 0,
+    },
+    iconContainer: {
+      flexShrink: 0,
+    },
+    rightIconContainer: {
+      marginLeft: 'auto',
     },
     hoveredStyle: componentScheme.hovered,
     pressedStyle: componentScheme.pressed,
     typography: {
+      flexShrink: 1,
       color: componentStyle.scheme[scheme].color,
       userSelect: 'none',
     },
