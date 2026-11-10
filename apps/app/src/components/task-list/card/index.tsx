@@ -19,10 +19,8 @@ import Checkbox from '@components/primitive/checkbox';
 import EditableTypography from '@components/primitive/editable-typography';
 
 import { CARD_TRANSITION_SPEED } from '../constants';
-import DeadlineBadge from './deadline-badge';
-import DeadlineButtonLabel from './deadline-button-label';
-import StartBadge from './start-badge';
-import StartButtonLabel from './start-button-label';
+import DateBadge from './date-badge';
+import DateButtonLabel from './date-button-label';
 
 type Draft = Pick<UpdateRequest, 'title' | 'notes'>;
 
@@ -125,7 +123,10 @@ export default function TaskCard({
         />
 
         {task.start && !expanded && (
-          <StartBadge date={dayjs(task.start.value)} />
+          <DateBadge
+            type="start"
+            date={dayjs(task.start.value)}
+          />
         )}
 
         <View style={styles.titleContainer}>
@@ -142,7 +143,10 @@ export default function TaskCard({
         </View>
 
         {task.deadline && !expanded && (
-          <DeadlineBadge date={dayjs(task.deadline)} />
+          <DateBadge
+            type="deadline"
+            date={dayjs(task.deadline)}
+          />
         )}
       </View>
 
@@ -173,13 +177,15 @@ export default function TaskCard({
 
           <View style={styles.buttonSet}>
             {!(task.completedAt && task.deletedAt) && (
-              <StartButtonLabel
+              <DateButtonLabel
+                type="start"
                 date={task.start?.value || undefined}
                 onPress={() => props.onPressStartDate?.(task.start?.value)}
               />
             )}
 
-            <DeadlineButtonLabel
+            <DateButtonLabel
+              type="deadline"
               date={task.deadline || undefined}
               onPress={() => props.onPressDeadline?.(task.deadline)}
             />
