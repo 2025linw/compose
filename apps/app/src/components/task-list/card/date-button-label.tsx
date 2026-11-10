@@ -57,14 +57,8 @@ function formatDate(inputDate: dayjs.Dayjs, type: DateType) {
   const date = inputDate.startOf('day');
   const today = getDateToday();
 
-  const nextYear = today.startOf('year').add(1, 'year');
-
   const isBeforeToday = date.isBefore(today);
   const isToday = date.isSame(today);
-  const isWithinMonth = date.isBefore(today.add(1, 'month'));
-  const isWithin6Months = date.isBefore(
-    today.startOf('month').add(6, 'months'),
-  );
   const isWithinYear = date.isBefore(today.startOf('year').add(1, 'year'));
 
   switch (type) {
@@ -91,21 +85,5 @@ function formatDate(inputDate: dayjs.Dayjs, type: DateType) {
     default:
       const exhaustive: never = type;
       return exhaustive;
-  }
-
-  if (isBeforeToday) {
-    return date.format(
-      type === 'start' ? 'MM/DD' : `MM/DD ${today.diff(date, 'day')}[d ago]`,
-    );
-  } else if (isToday) {
-    return 'Today';
-  } else if (isWithinMonth) {
-    return date.format(
-      type === 'start'
-        ? 'ddd, MMM D'
-        : `ddd, MMM D ${date.diff(today, 'day')}[d left]`,
-    );
-  } else {
-    return date.format('ddd, MM/YYYY');
   }
 }
