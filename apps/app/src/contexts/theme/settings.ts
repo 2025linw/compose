@@ -1,5 +1,7 @@
 import color from 'color';
 
+import { Platform } from 'react-native';
+
 import { buildPalette } from './build-palette';
 import { colorThemes } from './colors';
 import {
@@ -134,12 +136,26 @@ export function buildTheme(variant: ColorVariantName, theme: ThemeMode) {
       },
       TextInput: {
         container: {
+          padding: spacings.x2,
+
           borderWidth: spacings.thin,
           borderColor: palette.border,
           borderRadius: rounded.base,
-          padding: spacings.x2,
           backgroundColor: palette.surface,
         },
+        focused: Platform.select({
+          native: {
+            borderStyle: 'solid' as const,
+            borderWidth: spacings.min,
+            borderColor: palette.subtle,
+          },
+          web: {
+            outlineStyle: 'solid' as const,
+            outlineWidth: spacings.min,
+            outlineColor: String(palette.subtle),
+          },
+          default: {},
+        }),
         disabled: {
           backgroundColor: themeColors.secondary['secondary-3'],
         },
