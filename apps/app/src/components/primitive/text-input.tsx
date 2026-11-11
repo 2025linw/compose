@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   TextInput as RNTextInput,
   type TextInputProps as RNTextInputProps,
@@ -9,13 +9,15 @@ import {
 import { useTheme } from '@contexts/theme';
 import { type Theme } from '@contexts/theme/types';
 
-type TextInputProps = RNTextInputProps & {
+export type TextInputProps = RNTextInputProps & {
   disabled?: boolean;
 };
 
 export default function TextInput({
   onChangeText,
   style,
+  onFocus,
+  onBlur,
   editable = true,
   disabled,
   ...props
@@ -23,6 +25,7 @@ export default function TextInput({
   const theme = useTheme();
 
   const inputRef = useRef<RNTextInput>(null);
+  const [focused, setFocused] = useState(false);
 
   const styles = buildStyles(theme, disabled);
   const { color: placeholderTextColor } = styles.placeholder;
@@ -39,7 +42,15 @@ export default function TextInput({
       {...props}
       onChangeText={onChangeText}
       placeholderTextColor={placeholderTextColor}
-      style={[styles.container, styles.text, style]}
+      style={[styles.container, styles.text, focused && styles.focused, style]}
+      onFocus={(event) => {
+        setFocused(true);
+        onFocus?.(event);
+      }}
+      onBlur={(event) => {
+        setFocused(false);
+        onBlur?.(event);
+      }}
       editable={isEditable}
       autoFocus={!disabled && props.autoFocus}
       contextMenuHidden={disabled || props.contextMenuHidden}
@@ -57,6 +68,7 @@ function buildStyles(theme: Theme, disabled?: boolean) {
       ...(disabled ? componentStyle.disabled : undefined),
       pointerEvents: disabled ? 'none' : 'auto',
     },
+    focused: componentStyle.focused,
     text: componentStyle.input,
     placeholder: componentStyle.placeholder,
   });

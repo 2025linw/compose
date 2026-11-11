@@ -44,6 +44,14 @@ export default function DebugPage() {
 
       <HorizontalDivider />
 
+      <Button
+        onPress={() => router.navigate('/settings/debug/input-types-debug')}
+      >
+        Input Types Debug
+      </Button>
+
+      <HorizontalDivider />
+
       <Button onPress={() => router.navigate('/settings/debug/date-debug')}>
         Date Debug
       </Button>

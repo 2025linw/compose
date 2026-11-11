@@ -12,6 +12,7 @@ import { useBreakpoints } from '@hooks/use-breakpoint';
 import { useToast } from '@hooks/use-toast';
 
 import Layout from '@components/layout';
+import PasswordInput from '@components/password-input';
 import Button from '@components/primitive/button';
 import HorizontalDivider from '@components/primitive/horizontal-divider';
 import Icon from '@components/primitive/icon';
@@ -118,21 +119,19 @@ export default function SettingsPage() {
           </Typography>
 
           <View style={styles.inputPanel}>
-            <TextInput
+            <PasswordInput
               value={newPassword}
               onChangeText={setNewPassword}
               placeholder="Enter New Password"
-              secureTextEntry
               maxLength={128}
             />
 
             {!!newPassword && (
               <>
-                <TextInput
+                <PasswordInput
                   value={currentPassword}
                   onChangeText={setCurrentPassword}
                   placeholder="Enter Current Password"
-                  secureTextEntry
                 />
                 <Button onPress={changePassword}>Change Password</Button>
               </>

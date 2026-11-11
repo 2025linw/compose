@@ -8,6 +8,7 @@ import { type Theme } from '@contexts/theme/types';
 import { useToast } from '@hooks/use-toast';
 
 import FormField from '@components/forms/form-field';
+import PasswordInput from '@components/password-input';
 import Button from '@components/primitive/button';
 import TextInput from '@components/primitive/text-input';
 import Typography from '@components/primitive/typography';
@@ -27,8 +28,6 @@ export default function LoginForm({ type }: LoginFormProps) {
   const [isLoading, setLoading] = useState(false);
   const [email, setEmail] = useState('will@email.com');
   const [password, setPassword] = useState('testpass');
-  const [isPasswordShown] = useState(false);
-  // const [isPasswordShown, setPasswordShown] = useState(false);
 
   const styles = buildStyles(theme);
 
@@ -85,7 +84,7 @@ export default function LoginForm({ type }: LoginFormProps) {
             label={'Password'}
             style={styles.loginField}
           >
-            <TextInput
+            <PasswordInput
               style={styles.loginField}
               placeholder="Password"
               value={password}
@@ -95,7 +94,6 @@ export default function LoginForm({ type }: LoginFormProps) {
                 type === 'register' ? 'new-password' : 'current-password'
               }
               autoCorrect={false}
-              secureTextEntry={!isPasswordShown}
             />
           </FormField>
         </View>
