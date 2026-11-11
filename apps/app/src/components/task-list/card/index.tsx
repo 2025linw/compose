@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -27,8 +27,6 @@ type Draft = Pick<UpdateRequest, 'title' | 'notes'>;
 type TaskCardProps = {
   task: Task;
   expanded?: boolean;
-  onPress?: () => void;
-  disabled?: boolean;
 
   onTaskComplete?: () => void;
   onTaskReopen?: () => void;
@@ -42,8 +40,6 @@ type TaskCardProps = {
 export default function TaskCard({
   task,
   expanded = false,
-  disabled = false,
-  onPress,
   ...props
 }: TaskCardProps) {
   const theme = useTheme();
@@ -107,11 +103,7 @@ export default function TaskCard({
   }));
 
   return (
-    <Pressable
-      onPress={onPress}
-      disabled={disabled}
-      style={styles.container}
-    >
+    <View style={styles.container}>
       <View style={styles.mainRow}>
         <Checkbox
           defaultValue={!!task.completedAt}
@@ -137,7 +129,7 @@ export default function TaskCard({
             }}
             onSave={flushUpdate}
             placeholder="New Task"
-            disabled={disabled || !expanded}
+            disabled={!expanded}
             style={styles.titleTypography}
           />
         </View>
@@ -169,7 +161,7 @@ export default function TaskCard({
                 }}
                 onSave={flushUpdate}
                 placeholder="Notes"
-                disabled={disabled}
+                disabled={!expanded}
                 multiline
               />
             </View>
@@ -181,6 +173,7 @@ export default function TaskCard({
                 type="start"
                 date={task.start?.value || undefined}
                 onPress={() => props.onPressStartDate?.(task.start?.value)}
+                disabled={!expanded}
               />
             )}
 
@@ -188,6 +181,7 @@ export default function TaskCard({
               type="deadline"
               date={task.deadline || undefined}
               onPress={() => props.onPressDeadline?.(task.deadline)}
+              disabled={!expanded}
             />
 
             {/* <Button
@@ -202,7 +196,7 @@ export default function TaskCard({
           </View>
         </View>
       </Animated.View>
-    </Pressable>
+    </View>
   );
 }
 

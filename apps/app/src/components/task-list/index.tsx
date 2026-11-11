@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { type ListRenderItemInfo, StyleSheet, View } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { type ListRenderItemInfo, Pressable, StyleSheet } from 'react-native';
 import Animated, { useSharedValue } from 'react-native-reanimated';
-import { scheduleOnRN } from 'react-native-worklets';
 
 import { type Task, type UpdateRequest } from '@compose/types/task';
 
@@ -18,6 +16,7 @@ import MenuButton from './menu-button';
 
 type TaskListProp = {
   data?: Task[];
+  initTaskId?: string;
   onAddTask?: (onCreateCallback: (id: string) => void) => void;
   onTaskUpdate?: (id: string, update: Partial<UpdateRequest>) => void;
   onTaskComplete?: (id: string) => void;
@@ -28,6 +27,7 @@ type TaskListProp = {
 
 export default function TaskList({
   data,
+  initTaskId,
   onAddTask,
   onTaskUpdate,
   onTaskComplete,
@@ -38,7 +38,9 @@ export default function TaskList({
   const theme = useTheme();
 
   const taskAdded = useRef<string | null>(null);
-  const [expandedTask, setExpandedTask] = useState<Task | null>(null);
+  const [expandedTaskId, setExpandedTaskId] = useState<string | null>(
+    initTaskId || null,
+  );
   const [dateModal, setDateModal] = useState<{
     taskId: string;
     state: 'start' | 'deadline';
@@ -47,25 +49,16 @@ export default function TaskList({
   const touchedCard = useSharedValue(false);
 
   const styles = buildStyles(theme);
-  const activeExpandedTask = data?.some(({ id }) => id === expandedTask?.id)
-    ? expandedTask
-    : null;
-  const tapGesture = Gesture.Tap()
-    .maxDistance(5)
-    .cancelsTouchesInView(false)
-    .onEnd((_e, success) => {
-      if (success && !touchedCard.get()) {
-        scheduleOnRN(setExpandedTask, null);
-      }
-    });
+  const activeExpandedTask =
+    data?.find((task) => task.id === expandedTaskId) ?? null;
 
-  const taskPressHandler = (id: string) => {
+  function taskPressHandler(id: string) {
     if (activeExpandedTask === null) {
-      setExpandedTask(data?.find((task) => task.id === id) || null);
-    } else if (activeExpandedTask.id !== id) {
-      setExpandedTask(null);
+      setExpandedTaskId(id);
+    } else if (id !== activeExpandedTask.id) {
+      setExpandedTaskId(null);
     }
-  };
+  }
   const addTaskHandler = onAddTask
     ? () => {
         onAddTask?.((id) => {
@@ -74,11 +67,12 @@ export default function TaskList({
       }
     : undefined;
 
-  const renderTask = ({ item }: ListRenderItemInfo<Task>) => {
-    const expanded = item.id === activeExpandedTask?.id;
+  function renderTask({ item: task }: ListRenderItemInfo<Task>) {
+    const expanded = !!activeExpandedTask && task.id === activeExpandedTask.id;
 
     return (
-      <View
+      <Pressable
+        onPress={() => taskPressHandler(task.id)}
         onStartShouldSetResponderCapture={() => {
           touchedCard.set(true);
 
@@ -86,38 +80,36 @@ export default function TaskList({
         }}
       >
         <Card
-          task={item}
+          task={task}
           expanded={expanded}
 
-          onPress={() => taskPressHandler(item.id)}
-
-          onTaskUpdate={(patch) => onTaskUpdate?.(item.id, patch)}
-          onTaskComplete={() => onTaskComplete?.(item.id)}
-          onTaskReopen={() => onTaskReopen?.(item.id)}
+          onTaskUpdate={(patch) => onTaskUpdate?.(task.id, patch)}
+          onTaskComplete={() => onTaskComplete?.(task.id)}
+          onTaskReopen={() => onTaskReopen?.(task.id)}
 
           onPressStartDate={(date) => {
             setDateModal({
-              taskId: item.id,
+              taskId: task.id,
               state: 'start',
               initialDate: date,
             });
           }}
           onPressDeadline={(date) => {
             setDateModal({
-              taskId: item.id,
+              taskId: task.id,
               state: 'deadline',
               initialDate: date,
             });
           }}
         />
-      </View>
+      </Pressable>
     );
-  };
+  }
 
   useEffect(() => {
-    const newTask = data?.find((task) => taskAdded.current === task.id);
+    const newTask = data?.find((task) => task.id === taskAdded.current);
     if (newTask) {
-      setExpandedTask(newTask);
+      setExpandedTaskId(newTask.id);
     }
 
     taskAdded.current = null;
@@ -125,23 +117,22 @@ export default function TaskList({
 
   return (
     <>
-      <View
+      <Pressable
         style={styles.container}
         onStartShouldSetResponderCapture={() => {
           touchedCard.set(false);
 
           return false;
         }}
+        onPress={() => setExpandedTaskId(null)}
       >
-        <GestureDetector gesture={tapGesture}>
-          <Animated.FlatList
-            data={data}
-            keyExtractor={(item) => item.id}
-            renderItem={renderTask}
-            showsVerticalScrollIndicator={false}
-          />
-        </GestureDetector>
-      </View>
+        <Animated.FlatList
+          data={data}
+          keyExtractor={(item) => item.id}
+          renderItem={renderTask}
+          showsVerticalScrollIndicator={false}
+        />
+      </Pressable>
 
       <MenuButton
         state={activeExpandedTask ? 'card' : 'list'}
