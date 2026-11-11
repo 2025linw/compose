@@ -27,10 +27,10 @@ export default function TaskSearchModal() {
 
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebouncedValue(search, 300);
-  const results = useTaskSearch(debouncedSearch);
+  const searchResults = useTaskSearch(debouncedSearch);
 
   const styles = buildStyles(theme);
-  const tasks = results.data?.data.tasks ?? [];
+  const tasks = searchResults.data?.data.tasks ?? [];
 
   function taskSelectHandler(task: Task) {
     const href = resolveTaskDestination(task);
@@ -40,6 +40,7 @@ export default function TaskSearchModal() {
     }
 
     router.navigate(href);
+    setSearch('');
     closeSearch();
   }
 
@@ -66,12 +67,15 @@ export default function TaskSearchModal() {
           <TextInput
             onChangeText={setSearch}
             autoFocus
+            autoCorrect={false}
+            autoComplete="off"
+            autoCapitalize="none"
           />
 
           {tasks.length > 0 && (
             <View style={styles.results}>
               <SearchResults
-                data={results.data?.data.tasks ?? []}
+                data={searchResults.data?.data.tasks ?? []}
                 onSelectTask={taskSelectHandler}
               />
             </View>
@@ -121,15 +125,18 @@ function resolveTaskDestination(item: Task): Href | null {
   const startDate = item.start?.value.startOf('day');
   const deadlineDate = item.deadline?.startOf('day');
 
+  let href: Href;
   if (!startDate) {
-    return '/inbox';
-  } else if (startDate.isSame(today)) {
-    return '/today';
+    href = '/inbox';
+  } else if (!startDate.isAfter(today)) {
+    href = '/today';
   } else if (startDate.isAfter(today)) {
-    return '/upcoming';
+    href = '/upcoming';
   } else if (deadlineDate) {
-    return '/deadline';
+    href = '/deadline';
   } else {
     return null;
   }
+
+  return (href + `?taskId=${item.id}`) as Href;
 }

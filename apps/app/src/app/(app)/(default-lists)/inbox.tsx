@@ -1,10 +1,18 @@
+import { useLocalSearchParams } from 'expo-router';
+
 import { getTaskFilter } from '@services/api/helpers';
 
 import Icon from '@components/primitive/icon';
 
-import TaskListScreen from '@screens/task-list-screen';
+import TaskListScreen, {
+  type TaskListSearchParams,
+} from '@screens/task-list-screen';
+
+type SearchParams = TaskListSearchParams;
 
 export default function InboxPage() {
+  const searchParams = useLocalSearchParams<SearchParams>();
+
   const filter = getTaskFilter('inbox');
   const creation = {
     enabled: true,
@@ -21,6 +29,7 @@ export default function InboxPage() {
           color="skyblue"
         />
       }
+      searchParams={searchParams}
     />
   );
 }

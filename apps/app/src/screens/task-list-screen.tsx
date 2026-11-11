@@ -14,6 +14,10 @@ import Layout from '@components/layout';
 import { type IconProps } from '@components/primitive/icon';
 import TaskList from '@components/task-list';
 
+export type TaskListSearchParams = {
+  taskId: string;
+};
+
 const taskDefaults = {
   title: '',
   positionKey: 'm',
@@ -34,17 +38,17 @@ type TaskListScreenProps = {
   creation: TaskCreation;
   listName: string;
   listIcon?: ReactElement<IconProps>;
+  searchParams?: TaskListSearchParams;
 };
 
 export default function TaskListScreen({
   filter,
   creation,
+  searchParams,
   ...props
 }: TaskListScreenProps) {
   const theme = useTheme();
   const { gtTablet } = useBreakpoints();
-
-  const styles = buildStyles(theme, !gtTablet);
 
   const queryTasks = TaskHook.useTasks(filter);
 
@@ -54,6 +58,9 @@ export default function TaskListScreen({
   const reopenTask = TaskHook.useReopenTask();
   const trashTask = TaskHook.useTrashTask();
   const restoreTask = TaskHook.useRestoreTask();
+
+  const styles = buildStyles(theme, !gtTablet);
+  const initTaskId = searchParams?.taskId;
 
   const onAddTask = creation.enabled
     ? (onCreateCallback: (id: string) => void) => {
@@ -77,6 +84,7 @@ export default function TaskListScreen({
     >
       <TaskList
         data={queryTasks.data?.data.tasks}
+        initTaskId={initTaskId}
 
         onAddTask={onAddTask}
         onTaskUpdate={(id, update) =>

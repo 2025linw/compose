@@ -1,3 +1,5 @@
+import { useLocalSearchParams } from 'expo-router';
+
 import { type CreateRequest } from '@compose/types/task';
 
 import { getTaskFilter } from '@services/api/helpers';
@@ -5,9 +7,15 @@ import { getDateToday } from '@utils/date';
 
 import Icon from '@components/primitive/icon';
 
-import TaskListScreen from '@screens/task-list-screen';
+import TaskListScreen, {
+  type TaskListSearchParams,
+} from '@screens/task-list-screen';
+
+type SearchParams = TaskListSearchParams;
 
 export default function UpcomingPage() {
+  const searchParams = useLocalSearchParams<SearchParams>();
+
   const filter = getTaskFilter('upcoming');
   const defaults: Partial<CreateRequest> = {
     start: {
@@ -19,10 +27,7 @@ export default function UpcomingPage() {
   return (
     <TaskListScreen
       filter={filter}
-      creation={{
-        enabled: true,
-        defaults,
-      }}
+      creation={{ enabled: true, defaults }}
       listName="Upcoming"
       listIcon={
         <Icon
@@ -30,6 +35,7 @@ export default function UpcomingPage() {
           color="red"
         />
       }
+      searchParams={searchParams}
     />
   );
 }
