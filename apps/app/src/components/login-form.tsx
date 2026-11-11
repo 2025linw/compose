@@ -70,7 +70,6 @@ export default function LoginForm({ type }: LoginFormProps) {
             style={styles.loginField}
           >
             <TextInput
-              style={styles.loginField}
               placeholder="Email"
               value={email}
               onChangeText={setEmail}
@@ -85,7 +84,6 @@ export default function LoginForm({ type }: LoginFormProps) {
             style={styles.loginField}
           >
             <PasswordInput
-              style={styles.loginField}
               placeholder="Password"
               value={password}
               onChangeText={setPassword}
