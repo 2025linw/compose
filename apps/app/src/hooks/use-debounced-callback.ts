@@ -12,7 +12,7 @@ export function useDebouncedCallback<T extends unknown[]>(
   const callbackRef = useRef(callback);
   const pendingRef = useRef<PendingCall<T> | null>(null);
 
-  const run = (...args: T) => {
+  function run(...args: T) {
     cancel();
 
     const timer = setTimeout(() => {
@@ -24,9 +24,9 @@ export function useDebouncedCallback<T extends unknown[]>(
     }, delay);
 
     pendingRef.current = { timer, args };
-  };
+  }
 
-  const flush = () => {
+  function flush() {
     const pending = pendingRef.current;
     if (pending === null) return;
 
@@ -34,15 +34,15 @@ export function useDebouncedCallback<T extends unknown[]>(
     pendingRef.current = null;
 
     callbackRef.current(...pending.args);
-  };
+  }
 
-  const cancel = () => {
+  function cancel() {
     const pending = pendingRef.current;
     if (pending === null) return;
 
     clearTimeout(pending.timer);
     pendingRef.current = null;
-  };
+  }
 
   // Update callback if it is updated after first render
   useEffect(() => {

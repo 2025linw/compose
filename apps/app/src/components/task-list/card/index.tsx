@@ -70,7 +70,7 @@ export default function TaskCard({
     800,
   );
 
-  const updateDraft = (patch: Partial<Draft>) => {
+  function updateDraft(patch: Partial<Draft>) {
     const nextDraft = {
       ...draftRef.current,
       ...patch,
@@ -80,7 +80,7 @@ export default function TaskCard({
     setDraft(nextDraft);
 
     scheduleUpdate(nextDraft);
-  };
+  }
 
   useEffect(() => {
     const justCollapsed = wasExpanded.current && !expanded;
