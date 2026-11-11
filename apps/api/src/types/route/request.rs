@@ -10,7 +10,7 @@ pub enum UpdateField<T> {
 
 impl<T> UpdateField<T> {
     pub fn is_none(&self) -> bool {
-        return matches!(self, UpdateField::Unchanged);
+        matches!(self, UpdateField::Unchanged)
     }
 
     pub fn as_mut(&mut self) -> UpdateField<&mut T> {
