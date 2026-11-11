@@ -19,7 +19,7 @@ export default function List({ expanded = true }: ListProps) {
     <View style={styles.list}>
       <View>
         <NavButton
-          href="/lists/inbox"
+          href="/inbox"
           icon={{ name: 'file-tray', color: 'skyblue' }}
           expanded={expanded}
         >
@@ -29,21 +29,21 @@ export default function List({ expanded = true }: ListProps) {
         <HorizontalDivider />
 
         <NavButton
-          href="/lists/today"
+          href="/today"
           icon={{ name: 'today', color: '#EAB308' }}
           expanded={expanded}
         >
           Today
         </NavButton>
         <NavButton
-          href="/lists/upcoming"
+          href="/upcoming"
           icon={{ name: 'calendar', color: 'red' }}
           expanded={expanded}
         >
           Upcoming
         </NavButton>
         <NavButton
-          href="/lists/deadline"
+          href="/deadline"
           icon={{ name: 'flag', color: 'red' }}
           expanded={expanded}
         >
@@ -53,14 +53,14 @@ export default function List({ expanded = true }: ListProps) {
         <HorizontalDivider />
 
         <NavButton
-          href="/lists/logbook"
+          href="/logbook"
           icon={{ name: 'checkmark-circle', color: 'green' }}
           expanded={expanded}
         >
           Logbook
         </NavButton>
         <NavButton
-          href="/lists/trash"
+          href="/trash"
           icon={{ name: 'trash-bin', color: 'gray' }}
           expanded={expanded}
         >

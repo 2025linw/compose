@@ -8,7 +8,7 @@ export default function Index() {
   const { gtTablet } = useBreakpoints();
 
   if (gtTablet) {
-    return <Redirect href="/lists/inbox" />;
+    return <Redirect href="/inbox" />;
   } else {
     return <ListNavigator />;
   }
