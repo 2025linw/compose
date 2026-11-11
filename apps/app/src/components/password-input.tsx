@@ -9,12 +9,13 @@ import TextInput, {
   type TextInputProps,
 } from '@components/primitive/text-input';
 
-type PasswordInputType = Omit<TextInputProps, 'secureTextEntry'> & {};
+type PasswordInputType = Omit<TextInputProps, 'style' | 'secureTextEntry'>;
 
 export default function PasswordInput({
-  style,
   onFocus,
   onBlur,
+  disabled,
+  testID,
   ...props
 }: PasswordInputType) {
   const theme = useTheme();
@@ -25,7 +26,10 @@ export default function PasswordInput({
   const styles = buildStyles(theme);
 
   return (
-    <View style={[styles.container, focused && styles.focused]}>
+    <View
+      style={[styles.container, focused && styles.focused]}
+      testID={testID}
+    >
       <TextInput
         {...props}
         secureTextEntry={hidden}
@@ -38,11 +42,14 @@ export default function PasswordInput({
           setFocused(false);
           onBlur?.(event);
         }}
+        disabled={disabled}
       />
 
       <Pressable
         onPress={() => setHidden((prev) => !prev)}
         hitSlop={10}
+        role="button"
+        disabled={disabled}
       >
         <Icon name={hidden ? 'eye-outline' : 'eye-off-outline'} />
       </Pressable>
