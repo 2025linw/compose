@@ -3,6 +3,7 @@ use crate::{
         INVALID_SINGLE_LINE, NO_EMPTY_STRING, NO_ZERO_LIMIT, NO_ZERO_PAGE, TOO_LONG,
         ValidationError,
     },
+    types::route::UpdateField,
     utils::service::is_valid_single_line_string,
 };
 
@@ -121,7 +122,7 @@ pub fn validate_update_request(request: UpdateRequest) -> Result<UpdateRequest, 
         }
     }
 
-    if let Some(Some(ref category)) = request.category {
+    if let UpdateField::Set(ref category) = request.category {
         if category.is_empty() {
             return Err(ValidationError::InvalidValue {
                 field: "category",
@@ -148,7 +149,7 @@ fn normalize_update_request(request: &mut UpdateRequest) {
         *label = label.trim().to_owned();
     }
 
-    if let Some(category) = request.category.as_mut().and_then(Option::as_mut) {
+    if let UpdateField::Set(category) = request.category.as_mut() {
         *category = category.trim().to_owned();
     }
 }

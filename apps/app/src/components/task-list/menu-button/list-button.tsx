@@ -22,6 +22,8 @@ export default function ListButton({ onAddTask }: ListButtonProps) {
     if (onAddTask && success) scheduleOnRN(onAddTask);
   });
 
+  if (!onAddTask) return null;
+
   return (
     <GestureDetector gesture={tapGesture}>
       <Animated.View style={styles.container}>

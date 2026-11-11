@@ -29,5 +29,6 @@ export default function MenuButton({
 const styles = StyleSheet.create({
   container: {
     pointerEvents: 'box-none',
+    cursor: 'pointer',
   },
 });

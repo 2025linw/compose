@@ -1,46 +1,56 @@
 import { type ReactElement } from 'react';
 import { StyleSheet } from 'react-native';
 
-import { type task } from '@clearlist/types';
+import { type CreateRequest } from '@compose/types/task';
+
+import { type TaskFilterQuery } from '@services/api/types';
 
 import { useTheme } from '@contexts/theme';
 import { type Theme } from '@contexts/theme/types';
 import { useBreakpoints } from '@hooks/use-breakpoint';
 import * as TaskHook from '@hooks/use-tasks';
-import dayjs from '@lib/datetime';
-import { getCategoryQueryMap } from '@services/helpers';
-import { type Category } from '@services/types';
 
 import Layout from '@components/layout';
 import { type IconProps } from '@components/primitive/icon';
 import TaskList from '@components/task-list';
 
-const requiredTask: task.CreateRequest = {
-  title: '',
-  tags: [],
-  positionKey: 'm',
+export type TaskListSearchParams = {
+  taskId: string;
 };
 
-type CreatableCategory = Extract<
-  Category,
-  'inbox' | 'today' | 'upcoming' | 'deadline'
->;
+const taskDefaults = {
+  title: '',
+  positionKey: 'm',
+  tags: [],
+};
 
-type ListScreenProps = {
+type TaskCreation =
+  | {
+      enabled: false;
+    }
+  | {
+      enabled: true;
+      defaults?: Partial<CreateRequest>;
+    };
+
+type TaskListScreenProps = {
+  filter: TaskFilterQuery;
+  creation: TaskCreation;
   listName: string;
   listIcon?: ReactElement<IconProps>;
-  category: Category;
+  searchParams?: TaskListSearchParams;
 };
 
-export default function ListScreen(props: ListScreenProps) {
+export default function TaskListScreen({
+  filter,
+  creation,
+  searchParams,
+  ...props
+}: TaskListScreenProps) {
   const theme = useTheme();
   const { gtTablet } = useBreakpoints();
 
-  const styles = buildStyles(theme, !gtTablet);
-
-  const searchQuery = getCategoryQueryMap()[props.category];
-
-  const queryTasks = TaskHook.useTasks(searchQuery);
+  const queryTasks = TaskHook.useTasks(filter);
 
   const createTask = TaskHook.useCreateTask();
   const updateTask = TaskHook.useUpdateTask();
@@ -49,27 +59,21 @@ export default function ListScreen(props: ListScreenProps) {
   const trashTask = TaskHook.useTrashTask();
   const restoreTask = TaskHook.useRestoreTask();
 
-  const defaultTask: Record<CreatableCategory, () => task.CreateRequest> = {
-    inbox: () => requiredTask,
-    today: () => ({
-      ...requiredTask,
-      start: {
-        type: 'datetime',
-        value: dayjs().startOf('day'),
-      },
-    }),
-    upcoming: () => ({
-      ...requiredTask,
-      start: {
-        type: 'datetime',
-        value: dayjs().add(1, 'day').startOf('day'),
-      },
-    }),
-    deadline: () => ({
-      ...requiredTask,
-      deadline: dayjs().startOf('day'),
-    }),
-  };
+  const styles = buildStyles(theme, !gtTablet);
+  const initTaskId = searchParams?.taskId;
+
+  const onAddTask = creation.enabled
+    ? (onCreateCallback: (id: string) => void) => {
+        createTask.mutate(
+          { ...taskDefaults, ...creation.defaults },
+          {
+            onSuccess: ({ data }) => {
+              onCreateCallback(data.id);
+            },
+          },
+        );
+      }
+    : undefined;
 
   return (
     <Layout
@@ -80,17 +84,12 @@ export default function ListScreen(props: ListScreenProps) {
     >
       <TaskList
         data={queryTasks.data?.data.tasks}
+        initTaskId={initTaskId}
 
-        onAddTask={(onCreateCallback) => {
-          const category = props.category;
-          if (category !== 'logged' && category !== 'trash')
-            createTask.mutate(defaultTask[category](), {
-              onSuccess: ({ data }) => {
-                onCreateCallback(data.id);
-              },
-            });
-        }}
-        onTaskUpdate={(id, update) => updateTask.mutate({ id, update })}
+        onAddTask={onAddTask}
+        onTaskUpdate={(id, update) =>
+          updateTask.mutate({ id, payload: update })
+        }
         onTaskComplete={(id) => completeTask.mutate(id)}
         onTaskReopen={(id) => reopenTask.mutate(id)}
         onTaskTrash={(id) => trashTask.mutate(id)}

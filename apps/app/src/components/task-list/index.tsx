@@ -1,29 +1,24 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { type ListRenderItemInfo, StyleSheet, View } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import Animated, {
-  FadeIn,
-  FadeOut,
-  useSharedValue,
-} from 'react-native-reanimated';
-import { scheduleOnRN } from 'react-native-worklets';
+import { useEffect, useRef, useState } from 'react';
+import { type ListRenderItemInfo, Pressable, StyleSheet } from 'react-native';
+import Animated, { useSharedValue } from 'react-native-reanimated';
 
-import { type task } from '@clearlist/types';
+import { type Task, type UpdateRequest } from '@compose/types/task';
+
+import type dayjs from '@lib/datetime';
 
 import { useTheme } from '@contexts/theme';
 import { type Theme } from '@contexts/theme/types';
-import type dayjs from '@lib/datetime';
 
-import DateSelectModal from '@components/modals/date-select-modal';
+import DateTimeModal from '@components/modals/date-time';
 
 import Card from './card';
-import { CARD_TRANSITION_SPEED } from './constants';
 import MenuButton from './menu-button';
 
 type TaskListProp = {
-  data?: task.Task[];
+  data?: Task[];
+  initTaskId?: string;
   onAddTask?: (onCreateCallback: (id: string) => void) => void;
-  onTaskUpdate?: (id: string, update: Partial<task.UpdateRequest>) => void;
+  onTaskUpdate?: (id: string, update: Partial<UpdateRequest>) => void;
   onTaskComplete?: (id: string) => void;
   onTaskReopen?: (id: string) => void;
   onTaskTrash?: (id: string) => void;
@@ -32,6 +27,7 @@ type TaskListProp = {
 
 export default function TaskList({
   data,
+  initTaskId,
   onAddTask,
   onTaskUpdate,
   onTaskComplete,
@@ -42,7 +38,9 @@ export default function TaskList({
   const theme = useTheme();
 
   const taskAdded = useRef<string | null>(null);
-  const [expandedTask, setExpandedTask] = useState<task.Task | null>(null);
+  const [expandedTaskId, setExpandedTaskId] = useState<string | null>(
+    initTaskId || null,
+  );
   const [dateModal, setDateModal] = useState<{
     taskId: string;
     state: 'start' | 'deadline';
@@ -51,118 +49,96 @@ export default function TaskList({
   const touchedCard = useSharedValue(false);
 
   const styles = buildStyles(theme);
-  const activeExpandedTask = data?.some(({ id }) => id === expandedTask?.id)
-    ? expandedTask
-    : null;
+  const activeExpandedTask =
+    data?.find((task) => task.id === expandedTaskId) ?? null;
 
-  const handleTaskPress = useCallback(
-    (id: string) => {
-      if (activeExpandedTask === null) {
-        setExpandedTask(data?.find((task) => task.id === id) || null);
-      } else if (activeExpandedTask.id !== id) {
-        setExpandedTask(null);
+  function taskPressHandler(id: string) {
+    if (activeExpandedTask === null) {
+      setExpandedTaskId(id);
+    } else if (id !== activeExpandedTask.id) {
+      setExpandedTaskId(null);
+    }
+  }
+  const addTaskHandler = onAddTask
+    ? () => {
+        onAddTask?.((id) => {
+          taskAdded.current = id;
+        });
       }
-    },
-    [data, activeExpandedTask],
-  );
-  const addTask = useCallback(() => {
-    onAddTask?.((id) => {
-      taskAdded.current = id;
-    });
-  }, [taskAdded, onAddTask]);
-  const tapGesture = Gesture.Tap()
-    .maxDistance(5)
-    .cancelsTouchesInView(false)
-    .onEnd((_e, success) => {
-      if (success && !touchedCard.get()) {
-        scheduleOnRN(setExpandedTask, null);
-      }
-    });
+    : undefined;
+
+  function renderTask({ item: task }: ListRenderItemInfo<Task>) {
+    const expanded = !!activeExpandedTask && task.id === activeExpandedTask.id;
+
+    return (
+      <Pressable
+        onPress={() => taskPressHandler(task.id)}
+        onStartShouldSetResponderCapture={() => {
+          touchedCard.set(true);
+
+          return false;
+        }}
+      >
+        <Card
+          task={task}
+          expanded={expanded}
+
+          onTaskUpdate={(patch) => onTaskUpdate?.(task.id, patch)}
+          onTaskComplete={() => onTaskComplete?.(task.id)}
+          onTaskReopen={() => onTaskReopen?.(task.id)}
+
+          onPressStartDate={(date) => {
+            setDateModal({
+              taskId: task.id,
+              state: 'start',
+              initialDate: date,
+            });
+          }}
+          onPressDeadline={(date) => {
+            setDateModal({
+              taskId: task.id,
+              state: 'deadline',
+              initialDate: date,
+            });
+          }}
+        />
+      </Pressable>
+    );
+  }
 
   useEffect(() => {
-    const newTask = data?.find((task) => taskAdded.current === task.id);
+    const newTask = data?.find((task) => task.id === taskAdded.current);
     if (newTask) {
-      setExpandedTask(newTask);
+      setExpandedTaskId(newTask.id);
     }
 
     taskAdded.current = null;
   }, [taskAdded, data]);
 
-  const renderTask = useCallback(
-    ({ item }: ListRenderItemInfo<task.Task>) => {
-      const expanded = item.id === activeExpandedTask?.id;
-
-      return (
-        <Animated.View
-          entering={FadeIn.duration(CARD_TRANSITION_SPEED)}
-          exiting={FadeOut.duration(CARD_TRANSITION_SPEED)}
-          onStartShouldSetResponderCapture={() => {
-            touchedCard.set(true);
-
-            return false;
-          }}
-        >
-          <Card
-            task={item}
-            expanded={expanded}
-
-            onPress={() => handleTaskPress(item.id)}
-
-            onTaskUpdate={(patch) => onTaskUpdate?.(item.id, patch)}
-            onTaskComplete={() => onTaskComplete?.(item.id)}
-            onTaskReopen={() => onTaskReopen?.(item.id)}
-
-            onPressStartDate={(date) => {
-              setDateModal({
-                taskId: item.id,
-                state: 'start',
-                initialDate: date,
-              });
-            }}
-            onPressDeadline={(date) => {
-              setDateModal({
-                taskId: item.id,
-                state: 'deadline',
-                initialDate: date,
-              });
-            }}
-          />
-        </Animated.View>
-      );
-    },
-    [
-      touchedCard,
-      activeExpandedTask,
-      handleTaskPress,
-      onTaskComplete,
-      onTaskReopen,
-      onTaskUpdate,
-    ],
-  );
-
   return (
-    <View
-      style={styles.container}
-      onStartShouldSetResponderCapture={() => {
-        touchedCard.set(false);
+    <>
+      <Pressable
+        style={styles.container}
+        onStartShouldSetResponderCapture={() => {
+          touchedCard.set(false);
 
-        return false;
-      }}
-    >
-      <GestureDetector gesture={tapGesture}>
+          return false;
+        }}
+        onPress={() => setExpandedTaskId(null)}
+      >
         <Animated.FlatList
           data={data}
           keyExtractor={(item) => item.id}
           renderItem={renderTask}
           showsVerticalScrollIndicator={false}
         />
-      </GestureDetector>
+      </Pressable>
 
       <MenuButton
         state={activeExpandedTask ? 'card' : 'list'}
         style={styles.menuButton}
         deleted={!!activeExpandedTask?.deletedAt}
-        onAddTask={addTask}
+        onAddTask={addTaskHandler}
         onTrashTask={() => {
           if (activeExpandedTask) onTaskTrash?.(activeExpandedTask.id);
         }}
@@ -172,7 +148,7 @@ export default function TaskList({
       />
 
       {dateModal && (
-        <DateSelectModal
+        <DateTimeModal
           mode={dateModal.state}
           taskId={dateModal.taskId}
           initialDate={dateModal.initialDate}
@@ -180,12 +156,10 @@ export default function TaskList({
             const state = dateModal.state;
             if (state === 'start') {
               onTaskUpdate?.(dateModal.taskId, {
-                start: selectedDate
-                  ? {
-                      type: 'datetime',
-                      value: selectedDate,
-                    }
-                  : null,
+                start: selectedDate && {
+                  type: 'datetime',
+                  value: selectedDate,
+                },
               });
             } else {
               onTaskUpdate?.(dateModal.taskId, {
@@ -200,7 +174,7 @@ export default function TaskList({
           }}
         />
       )}
-    </View>
+    </>
   );
 }
 

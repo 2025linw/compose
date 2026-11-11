@@ -1,4 +1,4 @@
-# Clear List
+# Compose
 
 ## Getting started - Development
 
@@ -6,7 +6,7 @@
 
 > [!NOTE]
 > This will only need to be done the first time on a local development
-> If this is already completed, you may skip to the next section
+> If this is already completed, you may skip to the next section ('[Starting development servers](#starting-development-servers)')
 
 Copy and set `.env` files for api, auth, and app server with development environments
 

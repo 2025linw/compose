@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { useSessionApi } from '@contexts/auth';
@@ -32,41 +32,35 @@ export default function LoginForm({ type }: LoginFormProps) {
 
   const styles = buildStyles(theme);
 
-  const register = useCallback(
-    (info: { email: string; password: string }) => {
-      createAccount(info)
-        .then(
-          (success) => {
-            router.setParams({ animation: 'none' });
+  const register = (info: { email: string; password: string }) => {
+    createAccount(info)
+      .then(
+        (success) => {
+          router.setParams({ animation: 'none' });
 
-            if (success) router.replace('/');
-          },
-          (err) => {
-            toast.error(`Error registering: ${err}`);
-          },
-        )
-        .finally(() => setLoading(false));
-    },
-    [router, toast, createAccount],
-  );
+          if (success) router.replace('/');
+        },
+        (err) => {
+          toast.error(`Error registering: ${err}`);
+        },
+      )
+      .finally(() => setLoading(false));
+  };
 
-  const login = useCallback(
-    (info: { email: string; password: string }) => {
-      loginApi(info)
-        .then(
-          (success) => {
-            router.setParams({ animation: 'none' });
+  const login = (info: { email: string; password: string }) => {
+    loginApi(info)
+      .then(
+        (success) => {
+          router.setParams({ animation: 'none' });
 
-            if (success) router.replace('/');
-          },
-          (err) => {
-            toast.error(`Error logging in: ${err}`);
-          },
-        )
-        .finally(() => setLoading(false));
-    },
-    [router, toast, loginApi],
-  );
+          if (success) router.replace('/');
+        },
+        (err) => {
+          toast.error(`Error logging in: ${err}`);
+        },
+      )
+      .finally(() => setLoading(false));
+  };
 
   return (
     <View style={styles.container}>
@@ -166,8 +160,8 @@ function buildStyles(theme: Theme) {
       backgroundColor: theme.palette.surface,
     },
     inputContainer: {
-      justifyContent: 'center',
       alignItems: 'center',
+      justifyContent: 'center',
     },
     loginField: {
       margin: theme.spacings.x2,

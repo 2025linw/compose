@@ -1,8 +1,7 @@
-import { type ReactElement, type ReactNode } from 'react';
+import { type PropsWithChildren, type ReactElement } from 'react';
 import { cloneElement } from 'react';
 import {
   type ColorValue,
-  Platform,
   type PressableProps,
   type StyleProp,
   type TextStyle,
@@ -23,12 +22,11 @@ type ButtonSchemes = keyof Omit<
 >;
 
 type ButtonContent =
-  | {
+  | PropsWithChildren<{
       // Button with text (optional left and right icons)
-      children: ReactNode;
       leftIcon?: ReactElement<IconProps>;
       rightIcon?: ReactElement<IconProps>;
-    }
+    }>
   | {
       // Icon only
       children?: never;
@@ -91,15 +89,14 @@ export default function Button({
       style={(state) => [
         styles.container,
         (props.testOnly_hovered ||
-          (Platform.OS === 'web' &&
-            (state as typeof state & { hovered?: boolean }).hovered)) &&
+          (state.hovered !== undefined && state.hovered)) &&
           styles.hoveredStyle,
         state.pressed && styles.pressedStyle,
         typeof style === 'function' ? style(state) : style,
       ]}
       role="button"
     >
-      {leftIcon}
+      {leftIcon && <View style={styles.iconContainer}>{leftIcon}</View>}
 
       {children && (
         <View style={styles.textContainer}>
@@ -119,7 +116,11 @@ export default function Button({
         </View>
       )}
 
-      {rightIcon}
+      {rightIcon && (
+        <View style={[styles.iconContainer, styles.rightIconContainer]}>
+          {rightIcon}
+        </View>
+      )}
     </Pressable>
   );
 }
@@ -161,7 +162,7 @@ function buildStyles(
 
       flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'space-between',
+      justifyContent: 'flex-start',
       gap: theme.spacings.x2,
 
       borderWidth: useBorder ? BORDER_WIDTH : 0,
@@ -169,21 +170,27 @@ function buildStyles(
       borderColor: componentScheme.borderColor,
 
       backgroundColor: componentScheme.backgroundColor,
-      ...(iconOnly
-        ? {
-            width: iconOnlySize,
-            height: iconOnlySize,
+      ...(iconOnly && {
+        width: iconOnlySize,
+        height: iconOnlySize,
 
-            justifyContent: 'center',
-          }
-        : {}),
+        justifyContent: 'center',
+      }),
     },
     textContainer: {
-      flex: 1,
+      flexShrink: 1,
+      minWidth: 0,
+    },
+    iconContainer: {
+      flexShrink: 0,
+    },
+    rightIconContainer: {
+      marginLeft: 'auto',
     },
     hoveredStyle: componentScheme.hovered,
     pressedStyle: componentScheme.pressed,
     typography: {
+      flexShrink: 1,
       color: componentStyle.scheme[scheme].color,
       userSelect: 'none',
     },

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -7,33 +7,30 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { type task } from '@clearlist/types';
+import { type Task, type UpdateRequest } from '@compose/types/task';
+
+import dayjs from '@lib/datetime';
 
 import { useTheme } from '@contexts/theme';
 import { type Theme } from '@contexts/theme/types';
 import { useDebouncedCallback } from '@hooks/use-debounced-callback';
-import dayjs from '@lib/datetime';
 
 import Checkbox from '@components/primitive/checkbox';
 import EditableTypography from '@components/primitive/editable-typography';
 
 import { CARD_TRANSITION_SPEED } from '../constants';
-import DeadlineBadge from './deadline-badge';
-import DeadlineButtonLabel from './deadline-button-label';
-import StartBadge from './start-badge';
-import StartButtonLabel from './start-button-label';
+import DateBadge from './date-badge';
+import DateButtonLabel from './date-button-label';
 
-type Draft = Pick<task.UpdateRequest, 'title' | 'notes'>;
+type Draft = Pick<UpdateRequest, 'title' | 'notes'>;
 
 type TaskCardProps = {
-  task: task.Task;
+  task: Task;
   expanded?: boolean;
-  onPress?: () => void;
-  disabled?: boolean;
 
   onTaskComplete?: () => void;
   onTaskReopen?: () => void;
-  onTaskUpdate?: (patch: Partial<task.UpdateRequest>) => void;
+  onTaskUpdate?: (patch: Partial<UpdateRequest>) => void;
 
   onPressStartDate?: (initialDate?: dayjs.Dayjs) => void;
   onPressDeadline?: (initialDate?: dayjs.Dayjs) => void;
@@ -43,8 +40,6 @@ type TaskCardProps = {
 export default function TaskCard({
   task,
   expanded = false,
-  disabled = false,
-  onPress,
   ...props
 }: TaskCardProps) {
   const theme = useTheme();
@@ -54,9 +49,7 @@ export default function TaskCard({
     title: task.title,
     notes: task.notes,
   });
-  const [draft, setDraft] = useState<
-    Pick<task.UpdateRequest, 'title' | 'notes'>
-  >({
+  const [draft, setDraft] = useState<Pick<UpdateRequest, 'title' | 'notes'>>({
     title: task.title,
     notes: task.notes,
   });
@@ -64,7 +57,7 @@ export default function TaskCard({
   const animatedHeight = useSharedValue(0);
   const animatedOpacity = useSharedValue(0);
 
-  const styles = buildStyles(theme);
+  const styles = buildStyles(theme, expanded);
 
   const { run: scheduleUpdate, flush: flushUpdate } = useDebouncedCallback(
     (patch: Draft) => {
@@ -73,7 +66,7 @@ export default function TaskCard({
     800,
   );
 
-  const updateDraft = (patch: Partial<Draft>) => {
+  function updateDraft(patch: Partial<Draft>) {
     const nextDraft = {
       ...draftRef.current,
       ...patch,
@@ -83,7 +76,7 @@ export default function TaskCard({
     setDraft(nextDraft);
 
     scheduleUpdate(nextDraft);
-  };
+  }
 
   useEffect(() => {
     const justCollapsed = wasExpanded.current && !expanded;
@@ -110,11 +103,7 @@ export default function TaskCard({
   }));
 
   return (
-    <Pressable
-      onPress={onPress}
-      disabled={disabled}
-      style={[styles.container, expanded ? styles.expandedContainer : null]}
-    >
+    <View style={styles.container}>
       <View style={styles.mainRow}>
         <Checkbox
           defaultValue={!!task.completedAt}
@@ -126,7 +115,10 @@ export default function TaskCard({
         />
 
         {task.start && !expanded && (
-          <StartBadge date={dayjs(task.start.value)} />
+          <DateBadge
+            type="start"
+            date={dayjs(task.start.value)}
+          />
         )}
 
         <View style={styles.titleContainer}>
@@ -137,18 +129,21 @@ export default function TaskCard({
             }}
             onSave={flushUpdate}
             placeholder="New Task"
-            disabled={disabled || !expanded}
+            disabled={!expanded}
             style={styles.titleTypography}
           />
         </View>
 
         {task.deadline && !expanded && (
-          <DeadlineBadge date={dayjs(task.deadline)} />
+          <DateBadge
+            type="deadline"
+            date={dayjs(task.deadline)}
+          />
         )}
       </View>
 
       <Animated.View
-        style={[styles.panelClip, panelAnimation]}
+        style={panelAnimation}
         pointerEvents={expanded ? 'auto' : 'none'}
       >
         <View
@@ -166,7 +161,7 @@ export default function TaskCard({
                 }}
                 onSave={flushUpdate}
                 placeholder="Notes"
-                disabled={disabled}
+                disabled={!expanded}
                 multiline
               />
             </View>
@@ -174,15 +169,19 @@ export default function TaskCard({
 
           <View style={styles.buttonSet}>
             {!(task.completedAt && task.deletedAt) && (
-              <StartButtonLabel
+              <DateButtonLabel
+                type="start"
                 date={task.start?.value || undefined}
                 onPress={() => props.onPressStartDate?.(task.start?.value)}
+                disabled={!expanded}
               />
             )}
 
-            <DeadlineButtonLabel
+            <DateButtonLabel
+              type="deadline"
               date={task.deadline || undefined}
               onPress={() => props.onPressDeadline?.(task.deadline)}
+              disabled={!expanded}
             />
 
             {/* <Button
@@ -197,28 +196,25 @@ export default function TaskCard({
           </View>
         </View>
       </Animated.View>
-    </Pressable>
+    </View>
   );
 }
 
-function buildStyles(theme: Theme) {
+function buildStyles(theme: Theme, expanded: boolean) {
   return StyleSheet.create({
     container: {
       borderRadius: theme.rounded.lg,
       padding: theme.spacings.x3,
-    },
-    expandedContainer: {
-      backgroundColor: theme.palette.surface,
+
+      backgroundColor: expanded ? theme.palette.surface : 'transparent',
+      overflow: 'hidden',
     },
     mainRow: {
       flexShrink: 0,
       flexDirection: 'row',
-      justifyContent: 'flex-start',
       alignItems: 'center',
+      justifyContent: 'flex-start',
       gap: theme.spacings.x2,
-    },
-    panelClip: {
-      overflow: 'hidden',
     },
     panelContent: {
       position: 'absolute',
@@ -226,6 +222,8 @@ function buildStyles(theme: Theme) {
       left: 0,
       right: 0,
       paddingTop: theme.spacings.x5,
+
+      gap: theme.spacings.x2,
     },
     titleContainer: {
       flex: 1,
@@ -246,15 +244,15 @@ function buildStyles(theme: Theme) {
 
       display: 'flex',
       flexDirection: 'column',
-      justifyContent: 'flex-start',
       alignItems: 'stretch',
+      justifyContent: 'flex-start',
       gap: theme.spacings.x4,
     },
     buttonSet: {
       display: 'flex',
       flexDirection: 'row',
-      justifyContent: 'flex-end',
       alignItems: 'center',
+      justifyContent: 'flex-end',
       gap: theme.spacings.x4,
     },
   });

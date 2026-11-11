@@ -1,13 +1,13 @@
 import type dayjs from '@lib/datetime';
 
-export enum Cmp {
-  Equal = 'eq',
-  NotEqual = 'ne',
-  Less = 'lt',
-  LessEq = 'lte',
-  Greater = 'gt',
-  GreaterEq = 'gte',
-}
+export type QueryParams = Record<
+  string,
+  string | number | boolean | null | undefined
+>;
+
+export type SortOrder = 'asc' | 'desc';
+
+export type Cmp = 'eq' | 'ne' | 'lt' | 'lte' | 'gt' | 'gte';
 
 export type DateQuery =
   | { type: 'ex'; state: boolean }
@@ -18,7 +18,7 @@ export type DateQuery =
       date: dayjs.Dayjs;
     };
 
-export type TaskQuery = {
+export type TaskFilterQuery = {
   startDate?: DateQuery;
   deadline?: DateQuery;
 
@@ -26,7 +26,7 @@ export type TaskQuery = {
   deleted?: boolean;
 
   sortBy?: string;
-  sortOrder?: string;
+  sortOrder?: SortOrder;
 };
 
 export type Category =
