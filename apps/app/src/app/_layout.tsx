@@ -22,20 +22,21 @@ function AppInner() {
   const { loaded: themeLoaded } = useThemeContext();
   const { loaded: fontsLoaded, error: fontError } = useAppFonts();
 
-  // Check when
+  const isReady = authLoaded && themeLoaded && fontsLoaded;
+
   useEffect(() => {
-    if (themeLoaded && authLoaded && fontsLoaded) {
+    if (isReady) {
       SplashScreen.hide();
     }
-  }, [themeLoaded, authLoaded, fontsLoaded]);
-
-  if (!(themeLoaded && authLoaded && fontsLoaded)) return null;
+  }, [isReady]);
 
   if (fontError) {
     console.error('unable to load fonts');
 
     return null;
   }
+
+  if (!isReady) return null;
 
   return (
     <SearchProvider>

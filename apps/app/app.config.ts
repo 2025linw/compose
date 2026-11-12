@@ -37,12 +37,12 @@ export default (): ExpoConfig => ({
     [
       'expo-splash-screen',
       {
-        image: './assets/images/splash-icon.png',
+        image: './assets/images/icon.png',
         imageWidth: 200,
         resizeMode: 'contain',
-        backgroundColor: '#ffffff',
+        backgroundColor: '#FCFCFC',
         dark: {
-          backgroundColor: '#000000',
+          backgroundColor: '#111111',
         },
       },
     ],
