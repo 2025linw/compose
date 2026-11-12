@@ -6,7 +6,7 @@ import Typography from '@components/primitive/typography';
 export default function DateDebug() {
   return (
     <Layout
-      headerText="Date Debug"
+      headerText="Date"
       showBackButton
       scrollable
     >

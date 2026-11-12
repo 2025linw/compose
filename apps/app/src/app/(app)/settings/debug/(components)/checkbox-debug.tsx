@@ -4,7 +4,7 @@ import { Demo } from '@components/primitive/checkbox';
 export default function CheckboxDemo() {
   return (
     <Layout
-      headerText="Checkbox Debug"
+      headerText="Checkbox"
       showBackButton
     >
       <Demo />
