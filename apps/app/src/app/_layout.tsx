@@ -1,44 +1,67 @@
-import { SplashScreen, Stack } from 'expo-router';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+import { SplashScreen } from 'expo-router';
 import { useEffect } from 'react';
 import { StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { Provider as AuthProvider } from '@/context/auth';
-import { Provider as ThemeProvider, useThemeContext } from '@/context/theme';
+import AuthProvider, { useSession } from '@contexts/auth';
+import SearchProvider from '@contexts/search';
+import ThemeProvider, { useThemeContext } from '@contexts/theme';
+import { useAppFonts } from '@hooks/use-fonts';
+
+import AppShell from '@components/app-shell';
 
 SplashScreen.preventAutoHideAsync();
 
-export default function App() {
+const queryClient = new QueryClient();
+
+function AppInner() {
+  const { loaded: authLoaded } = useSession();
+  const { loaded: themeLoaded } = useThemeContext();
+  const { loaded: fontsLoaded, error: fontError } = useAppFonts();
+
+  // Check when
+  useEffect(() => {
+    if (themeLoaded && authLoaded && fontsLoaded) {
+      SplashScreen.hide();
+    }
+  }, [themeLoaded, authLoaded, fontsLoaded]);
+
+  if (!(themeLoaded && authLoaded && fontsLoaded)) return null;
+
+  if (fontError) {
+    console.error('unable to load fonts');
+
+    return null;
+  }
+
   return (
-    <GestureHandlerRootView style={styles.rootContainer}>
-      <SafeAreaProvider>
-        <ThemeProvider>
-          <AuthProvider>
-            <AppInner />
-          </AuthProvider>
-        </ThemeProvider>
-      </SafeAreaProvider>
-    </GestureHandlerRootView>
+    <SearchProvider>
+      <AppShell />
+    </SearchProvider>
   );
 }
 
-function AppInner() {
-  const { loaded } = useThemeContext();
-
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hide();
-    }
-  }, [loaded]);
-
-  if (!loaded) return null;
-
-  return <Stack screenOptions={{ headerShown: false }} />;
+export default function App() {
+  return (
+    <SafeAreaProvider>
+      <GestureHandlerRootView style={styles.root}>
+        <QueryClientProvider client={queryClient}>
+          <ThemeProvider>
+            <AuthProvider>
+              <AppInner />
+            </AuthProvider>
+          </ThemeProvider>
+        </QueryClientProvider>
+      </GestureHandlerRootView>
+    </SafeAreaProvider>
+  );
 }
 
 const styles = StyleSheet.create({
-  rootContainer: {
+  root: {
     flex: 1,
   },
 });
