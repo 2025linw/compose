@@ -8,7 +8,7 @@ export default function ToastDebug() {
 
   return (
     <Layout
-      headerText="Toast Debug"
+      headerText="Toast"
       showBackButton
     >
       <Button onPress={() => toast.message('This is a default toast')}>

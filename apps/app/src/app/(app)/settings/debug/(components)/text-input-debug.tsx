@@ -4,7 +4,7 @@ import { Demo } from '@components/primitive/text-input';
 export default function TextInputDebug() {
   return (
     <Layout
-      headerText="TextInput Debug"
+      headerText="TextInput"
       showBackButton
     >
       <Demo />

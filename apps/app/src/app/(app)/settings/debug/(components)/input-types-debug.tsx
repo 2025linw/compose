@@ -5,7 +5,7 @@ import TextInput from '@components/primitive/text-input';
 export default function InputTypesDebug() {
   return (
     <Layout
-      headerText="InputTypes Debug"
+      headerText="InputTypes"
       showBackButton
     >
       <TextInput />

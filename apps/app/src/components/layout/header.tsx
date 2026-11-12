@@ -65,7 +65,16 @@ export default function Header(props: HeaderProps) {
       <View style={styles.content}>
         {icon}
 
-        {props.text && <Typography variant="h1">{props.text}</Typography>}
+        {props.text && (
+          <Typography
+            variant="h1"
+            style={styles.text}
+            numberOfLines={1}
+            ellipsizeMode="clip"
+          >
+            {props.text}
+          </Typography>
+        )}
       </View>
 
       <View style={styles.side} />
@@ -89,6 +98,10 @@ function buildStyles(theme: Theme, topInset?: number) {
       width: HEADER_HEIGHT,
       height: HEADER_HEIGHT,
     },
+    button: {
+      width: BUTTON_SIZE,
+      height: BUTTON_SIZE,
+    },
     content: {
       flex: 1,
       minWidth: 0,
@@ -97,10 +110,13 @@ function buildStyles(theme: Theme, topInset?: number) {
       alignItems: 'center',
       justifyContent: 'center',
       gap: 10,
+
+      overflow: 'hidden',
     },
-    button: {
-      width: BUTTON_SIZE,
-      height: BUTTON_SIZE,
+    text: {
+      flexShrink: 1,
+      minWidth: 0,
+      textAlign: 'left',
     },
   });
 }

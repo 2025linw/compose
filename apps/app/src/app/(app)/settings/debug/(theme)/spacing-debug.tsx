@@ -7,7 +7,7 @@ import Layout from '@components/layout';
 export default function SpacingDebug() {
   return (
     <Layout
-      headerText="Spacing Debug"
+      headerText="Spacing"
       showBackButton
     >
       <Text

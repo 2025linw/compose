@@ -4,7 +4,7 @@ import { Demo } from '@components/primitive/typography';
 export default function TypographyDebug() {
   return (
     <Layout
-      headerText="Typography Debug"
+      headerText="Typography"
       showBackButton
     >
       <Demo />
