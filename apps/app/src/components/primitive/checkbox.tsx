@@ -22,22 +22,22 @@ export default function Checkbox({
 }: CheckboxProps) {
   const theme = useTheme();
 
-  const [checked, setChecked] = useState(defaultValue);
+  const [internalChecked, setInternalChecked] = useState(defaultValue);
 
-  const checkedResolved = value ?? checked;
+  const resolvedChecked = value ?? internalChecked;
 
-  function onPress(e: GestureResponderEvent) {
+  function onPressHandler(e: GestureResponderEvent) {
     e.stopPropagation();
 
     if (disabled) return;
 
-    const next = !checked;
+    const next = !internalChecked;
 
     onValueChange?.(next);
-    setChecked(next);
+    setInternalChecked(next);
   }
 
-  const iconName = checkedResolved
+  const iconName = resolvedChecked
     ? 'checkbox'
     : disabled
       ? 'square'
@@ -47,7 +47,7 @@ export default function Checkbox({
     <Pressable
       role="checkbox"
       disabled={disabled}
-      onPress={onPress}
+      onPress={onPressHandler}
       testID={props.testID}
     >
       <Icon

@@ -23,7 +23,7 @@ export default function Select({
   const isControlled = value !== undefined;
   const selectedValue = isControlled ? value : internalValue;
 
-  function handleChange(nextValue: SelectValue | '') {
+  function onChangeHandler(nextValue: SelectValue | '') {
     if (!isControlled) setInternalValue(nextValue);
 
     onValueChange?.(nextValue);
@@ -32,7 +32,7 @@ export default function Select({
   return (
     <Picker
       selectedValue={selectedValue}
-      onValueChange={handleChange}
+      onValueChange={onChangeHandler}
       style={styles.container}
     >
       <Picker.Item

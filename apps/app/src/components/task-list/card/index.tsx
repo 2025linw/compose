@@ -66,7 +66,7 @@ export default function TaskCard({
     800,
   );
 
-  function updateDraft(patch: Partial<Draft>) {
+  function updateHandler(patch: Partial<Draft>) {
     const nextDraft = {
       ...draftRef.current,
       ...patch,
@@ -125,7 +125,7 @@ export default function TaskCard({
           <EditableTypography
             value={draft.title}
             onChangeText={(title) => {
-              updateDraft({ title });
+              updateHandler({ title });
             }}
             onSave={flushUpdate}
             placeholder="New Task"
@@ -157,7 +157,7 @@ export default function TaskCard({
               <EditableTypography
                 value={draft.notes || undefined}
                 onChangeText={(notes) => {
-                  updateDraft({ notes });
+                  updateHandler({ notes });
                 }}
                 onSave={flushUpdate}
                 placeholder="Notes"

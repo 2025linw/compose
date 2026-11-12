@@ -44,7 +44,7 @@ export default function SettingsPage() {
   const colorThemes = getAllColorThemes();
   const user = session.data?.user;
 
-  function changePassword() {
+  function changePasswordHandler() {
     if (newPassword.length < 8) {
       toast.error('New password must be longer than 8 characters');
 
@@ -72,7 +72,7 @@ export default function SettingsPage() {
       });
   }
 
-  function logout() {
+  function logoutHandler() {
     logoutApi().finally(() => {
       router.replace('/login');
     });
@@ -133,7 +133,7 @@ export default function SettingsPage() {
                   onChangeText={setCurrentPassword}
                   placeholder="Enter Current Password"
                 />
-                <Button onPress={changePassword}>Change Password</Button>
+                <Button onPress={changePasswordHandler}>Change Password</Button>
               </>
             )}
           </View>
@@ -235,7 +235,7 @@ export default function SettingsPage() {
           </Button>
         )}
 
-        <Button onPress={logout}>Logout</Button>
+        <Button onPress={logoutHandler}>Logout</Button>
       </View>
     </Layout>
   );

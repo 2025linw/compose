@@ -26,7 +26,7 @@ export default function Select({
   const isControlled = value !== undefined;
   const selectedValue = isControlled ? value : internalValue;
 
-  function handleChange(nextValue: SelectValue | '') {
+  function onChangeHandler(nextValue: SelectValue | '') {
     if (!isControlled) setInternalValue(nextValue);
 
     onValueChange?.(nextValue);
@@ -49,7 +49,7 @@ export default function Select({
         >
           <Picker
             selectedValue={selectedValue}
-            onValueChange={handleChange}
+            onValueChange={onChangeHandler}
             appearance="wheel"
           >
             <Picker.Item
@@ -79,7 +79,7 @@ export default function Select({
                   scheme="tertiary"
                   hasBorder
                   onPress={() => {
-                    handleChange(item.value);
+                    onChangeHandler(item.value);
 
                     setIsPresented(false);
                   }}
