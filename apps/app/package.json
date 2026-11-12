@@ -4,8 +4,10 @@
   "version": "0.0.1",
   "main": "expo-router/entry",
   "scripts": {
-    "start": "dotenv -e .env.local -- expo start",
-    "start-clean": "dotenv -e .env.local -- expo start --clear",
+    "start": "dotenv -e .env.local -- expo start --dev-client",
+    "start-clean": "npm run start -- --clear",
+    "build:android": "expo run:android",
+    "build-clean:android": "expo prebuild --clean && expo run:android",
     "dev": "npm run start --",
     "prod": "dotenv -e .env.local -- expo start --no-dev",
     "export:web": "expo export --platform web",
