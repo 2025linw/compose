@@ -16,9 +16,9 @@ type CheckboxProps = {
 export default function Checkbox({
   value,
   defaultValue,
-  disabled,
   onValueChange,
-  ...props
+  disabled,
+  testID,
 }: CheckboxProps) {
   const theme = useTheme();
 
@@ -48,13 +48,13 @@ export default function Checkbox({
       role="checkbox"
       disabled={disabled}
       onPress={onPressHandler}
-      testID={props.testID}
+      testID={testID}
     >
       <Icon
         name={iconName}
         size={20}
         color={disabled ? theme.palette.subtle : theme.palette.text}
-        testID={props.testID ? `${props.testID}-icon` : undefined}
+        testID={testID ? `${testID}-icon` : undefined}
       />
     </Pressable>
   );
