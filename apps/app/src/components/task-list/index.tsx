@@ -4,7 +4,7 @@ import Animated, { useSharedValue } from 'react-native-reanimated';
 
 import { type Task, type UpdateRequest } from '@compose/types/task';
 
-import type dayjs from '@lib/datetime';
+import dayjs from '@lib/datetime';
 
 import { useTheme } from '@contexts/theme';
 import { type Theme } from '@contexts/theme/types';
@@ -149,27 +149,33 @@ export default function TaskList({
 
       {dateModal && (
         <DateTimeModal
-          mode={dateModal.state}
-          taskId={dateModal.taskId}
-          initialDate={dateModal.initialDate}
-          onDateSelect={(selectedDate) => {
+          visible={dateModal !== null}
+          canSelectTime={dateModal.state === 'start'}
+          defaultValue={dateModal.initialDate?.toDate()}
+          onChangeValue={(selectedDate) => {
             const state = dateModal.state;
-            if (state === 'start') {
-              onTaskUpdate?.(dateModal.taskId, {
-                start: selectedDate && {
-                  type: 'datetime',
-                  value: selectedDate,
-                },
-              });
-            } else {
-              onTaskUpdate?.(dateModal.taskId, {
-                deadline: selectedDate,
-              });
-            }
+            switch (state) {
+              case 'start':
+                onTaskUpdate?.(dateModal.taskId, {
+                  start: selectedDate && {
+                    type: 'datetime',
+                    value: dayjs(selectedDate),
+                  },
+                });
 
-            setDateModal(null);
+                return;
+              case 'deadline':
+                onTaskUpdate?.(dateModal.taskId, {
+                  deadline: dayjs(selectedDate),
+                });
+
+                return;
+              default:
+                const exhaustive: never = state;
+                return exhaustive;
+            }
           }}
-          dismiss={() => {
+          onDismiss={() => {
             setDateModal(null);
           }}
         />
