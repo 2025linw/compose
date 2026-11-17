@@ -41,6 +41,9 @@ export default function DebugPage() {
       >
         Editable Typography Debug
       </Button>
+      <Button onPress={() => router.navigate('/settings/debug/calendar-debug')}>
+        Calendar Debug
+      </Button>
 
       <HorizontalDivider />
 
